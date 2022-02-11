@@ -58,6 +58,7 @@ def coloca_pedidos_no_banco(pagina):
         # # identifica o cliente que fez o pedido
         # # e obtém o mesmo do banco de dados
         cliente_db = Contato.objects.filter(nome=nome_cliente_bling).order_by('id').first()
+        
         # cria objeto Pedido no banco de dados
         pedido_db = Pedido.objects.create(
                         cliente = cliente_db,
@@ -70,9 +71,8 @@ def coloca_pedidos_no_banco(pagina):
                         total_venda = pedido_bling['totalvenda'],
                         situacao = pedido_bling['situacao'],
                         data_saida = pedido_bling['dataSaida'],
-                        loja = pedido_bling['loja'],
                         # numero_pedido_loja = pedido_bling['numeroPedidoLoja'],
-                        tipo_integracao = pedido_bling['tipoIntegracao'],
+                        # tipo_integracao = pedido_bling['tipoIntegracao'],
         )
 
         pedido_db.save()
@@ -106,7 +106,7 @@ def coloca_pedidos_no_banco(pagina):
                 )
                 item_db.save()
                 print(f"- {item['descricao']}")
-                sleep(0.1)
+                
 
 
             
