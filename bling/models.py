@@ -133,7 +133,7 @@ class Pedido(models.Model):
     total_produtos = models.DecimalField(max_digits=11, decimal_places=2, default=0.00, null=True)
     total_venda = models.DecimalField(max_digits=11, decimal_places=2, default=0.00, null=True)
     tipo_integracao = models.CharField(max_length=60, default="", null=True)
-    # cliente = models.ForeignKey(Contato, default="", on_delete=models.DO_NOTHING, null=True)
+    cliente = models.ForeignKey(Contato, default="", on_delete=models.DO_NOTHING, null=True)
     # transporte = models.ForeignKey(Contato, default="", on_delete=models.DO_NOTHING, null=True)
     # item = models.ForeignKey(Item, default="", on_delete=models.DO_NOTHING, null=True)
     def __str__(self):
