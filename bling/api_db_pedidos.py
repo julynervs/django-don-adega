@@ -12,22 +12,22 @@ sys.path.insert(1, os.path.abspath("."))
 import donadega.settings
 import donadega.wsgi
 
+from time import sleep
+
 def get_pedidos():
     """
     Função que faz requisição GET pedidos pela API do bling 
     """
-    url = "https://bling.com.br/Api/v2/pedidos/json/?apikey=a46ebb16b15e9fdfade2817a3b346942fabe8320811de301aa81b5cbde6feb6d864c1d19"
-
+    url = f"https://bling.com.br/Api/v2/pedidos/page={pagina}/json/?apikey=a46ebb16b15e9fdfade2817a3b346942fabe8320811de301aa81b5cbde6feb6d864c1d19"
     payload='apikey=a46ebb16b15e9fdfade2817a3b346942fabe8320811de301aa81b5cbde6feb6d864c1d19'
     headers = {
     'Content-Type': 'application/x-www-form-urlencoded'
     }
-
     response = requests.request("GET", url, headers=headers, data=payload)
-
+    sleep(0.5)
     return response.text
 
-def coloca_pedido_no_banco():
+def coloca_pedidos_no_banco():
     """
     Esta função recebe o retorno de get_contatos(),
     faz o tratamento dos dados do JSON
@@ -55,4 +55,4 @@ def coloca_pedido_no_banco():
 
         # pedido.cliente = Contato.objects.get(nome=nome_cliente_bling)
         # pedido.save()
-coloca_pedido_no_banco()
+coloca_pedidos_no_banco()
