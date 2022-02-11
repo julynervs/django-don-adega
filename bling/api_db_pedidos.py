@@ -84,7 +84,7 @@ def coloca_pedidos_no_banco(pagina):
                             profundidade = item['profundidade'],
                             unidade_medida = item['unidadeMedida'],
                             gtin = item['gtin'],
-                            pedido = pedido_db.id,
+                            pedido = pedido_db,
                 )
                 item_db.save()
 
