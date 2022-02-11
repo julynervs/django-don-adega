@@ -1,0 +1,21 @@
+# Django #
+*.log
+*.pot
+*.pyc
+__pycache__
+db.sqlite3
+media
+
+# virtualenv generated files #
+##############################
+# Scripts
+# Lib
+# Include
+
+# virtualenv folders #
+######################
+# venv
+
+# cached chrome files #
+#######################
+# donproject/robo/chrome_do_testador
