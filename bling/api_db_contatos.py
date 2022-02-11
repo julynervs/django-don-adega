@@ -90,7 +90,7 @@ def coloca_contatos_no_banco(pagina):
             limite_credito = contato_bling['limiteCredito']
         )
         contato_db.save()
-        sleep(0.2)
+        sleep(0.1)
 
         # cria tabela para os tipos de contato
         # define qual contato é cliente e/ou fornecedor e/ou transportador etc
@@ -102,11 +102,11 @@ def coloca_contatos_no_banco(pagina):
                 contato=contato_db
             )
             tipo_contato_db.save()
-            sleep(0.2)
+            sleep(0.1)
 
 def main():
     paginas = 250
-    for pagina in range(paginas):
+    for pagina in range(1, paginas):
         try:
             coloca_contatos_no_banco(pagina)
         except KeyError:

@@ -39,7 +39,6 @@ def coloca_produtos_no_banco(pagina):
     # get_mais_produtos(pagina)
     # formata json recebido
     json = json.loads(get_produtos(pagina))
-    sleep(0.5)
     lista_produtos = json['retorno']['produtos']
 
     print("\n")
