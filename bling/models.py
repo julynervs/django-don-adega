@@ -127,7 +127,7 @@ class Pedido(models.Model):
     obs = models.CharField(max_length=255, default="", null=True)
     loja = models.IntegerField(default=0, null=True)
     vendedor = models.CharField(max_length=60, default="", null=True)
-    numero_pedido_loja = models.IntegerField(default=0, null=True)
+    numero_pedido_loja = models.IntegerField(default=0, blank=True, null=True)
     nat_operacao = models.CharField(max_length=60, default="Venda de mercadorias", null=True)
     situacao = models.CharField(max_length=30, default="", null=True)
     total_produtos = models.DecimalField(max_digits=11, decimal_places=2, default=0.00, null=True)
@@ -140,7 +140,7 @@ class Pedido(models.Model):
         return self.cliente
 
 class Item(models.Model):
-    codigo = models.CharField(max_length=60, default="")
+    codigo = models.CharField(max_length=60, default="", null=True, blank=True)
     descricao = models.CharField(max_length=120, default="", null=True)
     quantidade = models.DecimalField(max_digits=11, decimal_places=4, default=0.0000, null=True)
     valor_unidade = models.DecimalField(max_digits=17, decimal_places=10, null=True)

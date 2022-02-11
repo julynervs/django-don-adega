@@ -58,32 +58,37 @@ def coloca_pedidos_no_banco(pagina):
         # # identifica o cliente que fez o pedido
         # # e obtém o mesmo do banco de dados
         cliente_db = Contato.objects.filter(nome=nome_cliente_bling).order_by('id').first()
-
+        # cria objeto Pedido no banco de dados
         pedido_db = Pedido.objects.create(
                         cliente = cliente_db,
                         data = pedido_bling['data'],
                         numero = pedido_bling['numero'],
                         vendedor = pedido_bling['vendedor'],
-                        valorfrete = pedido_bling['vlr_frete'],
-                        desconto = pedido_bling['vlr_desconto'],
+                        vlr_frete = pedido_bling['valorfrete'],
+                        vlr_desconto = pedido_bling['desconto'].replace(',', '.'),
                         total_produtos = pedido_bling['totalprodutos'],
                         total_venda = pedido_bling['totalvenda'],
                         situacao = pedido_bling['situacao'],
                         data_saida = pedido_bling['dataSaida'],
                         loja = pedido_bling['loja'],
-                        numero_pedido_loja = pedido_bling['numeroPedidoLoja'],
-                        tipo_intgracao = pedido_bling['tipoIntegracao']
+                        # numero_pedido_loja = pedido_bling['numeroPedidoLoja'],
+                        tipo_integracao = pedido_bling['tipoIntegracao'],
         )
 
         pedido_db.save()
         sleep(0.1)
-        print(f"# Pedido {n} {pedido_bling['numero']}, Cliente {cliente_db.nome} cadastrado")
+        print(f"\n# Pedido {n} {pedido_bling['numero']}, Cliente {cliente_db.nome} cadastrado")
 
         if "itens" in pedido_bling:
             itens_bling = pedido_bling['itens']
             print("Itens:")
             for item in itens_bling:
                 item = item['item']
+                # valida valores '', quando se espera um numero
+                for key in item.keys():
+                    if item[key] == '':
+                        item[key] = 0
+                # cria objeto Item no banco de dados
                 item_db = Item.objects.create(
                             codigo = item['codigo'],
                             descricao = item['descricao'],
@@ -100,19 +105,20 @@ def coloca_pedidos_no_banco(pagina):
                             pedido = pedido_db,
                 )
                 item_db.save()
-                print(f"- {item}")
+                print(f"- {item['descricao']}")
                 sleep(0.1)
 
 
             
 def main():
     paginas = 250
-    for pagina in range(1, paginas):
-        try:
-            coloca_pedidos_no_banco(pagina)
-        except KeyError:
-            print("Não tem mais produtos para cadastrar.")
-            break
-        else:
-            print(f"{pagina} páginas foram cadastradas.")
+    for pagina in range(7, paginas):
+        # try:
+        coloca_pedidos_no_banco(pagina)
+        # except Exception as e:
+        #     print(e)
+        #     print("Não tem mais produtos para cadastrar.")
+        #     break
+        # else:
+        #     print(f"{pagina} páginas foram cadastradas.")
 main()
