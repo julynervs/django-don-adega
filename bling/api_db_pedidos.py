@@ -34,6 +34,7 @@ def coloca_pedidos_no_banco(pagina):
     e salva essas informações no banco de dados do Django
     """
     import json
+    from bling.models import Contato
     from bling.models import Pedido
     from bling.models import Item
 
@@ -57,11 +58,11 @@ def coloca_pedidos_no_banco(pagina):
 
         # # identifica o cliente que fez o pedido
         # # e obtém o mesmo do banco de dados
-        # nome_contato = Contato.objects.filter(nome=nome_cliente_bling).order_by('id').first()
-        # print(nome_contato.id)
+        cliente_db = Contato.objects.filter(nome=nome_cliente_bling).order_by('id').first()
 
         pedido_db = Pedido.objects.create(
-                        data = pedido_bling['data']
+                        data = pedido_bling['data'],
+                        cliente = cliente_db,
         )
 
         pedido_db.save()
@@ -88,8 +89,6 @@ def coloca_pedidos_no_banco(pagina):
                 )
                 item_db.save()
 
-        # nome_contato = Contato.objects.filter(nome=nome_cliente_bling).order_by('id').first()
-        # print(nome_contato.id)
         break
 
 
