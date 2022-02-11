@@ -14,7 +14,7 @@ import donadega.wsgi
 
 from time import sleep
 
-def get_pedidos():
+def get_pedidos(pagina):
     """
     Função que faz requisição GET pedidos pela API do bling 
     """
@@ -27,7 +27,7 @@ def get_pedidos():
     sleep(0.5)
     return response.text
 
-def coloca_pedidos_no_banco():
+def coloca_pedidos_no_banco(pagina):
     """
     Esta função recebe o retorno de get_contatos(),
     faz o tratamento dos dados do JSON
@@ -35,24 +35,62 @@ def coloca_pedidos_no_banco():
     """
     import json
     from bling.models import Pedido
-    from bling.models import Contato
+    from bling.models import Item
 
     # formata json recebido
-    json = json.loads(get_pedidos())
+    json = json.loads(get_pedidos(pagina))
     lista_pedidos = json['retorno']['pedidos']
 
+    print("\n")
+    print("#"*10)
+    print(f"Página {pagina}")
+    print("#"*10)
+
+    c = []
     # percorre a lista de todos os pedidos
     for n in range(len(lista_pedidos)):
         pedido_bling = lista_pedidos[n]['pedido']
         chaves = list(lista_pedidos[n]['pedido'].keys())
-        
+        # print(pedido_bling)
+        # break
         nome_cliente_bling = pedido_bling['cliente']['nome']
-        # print(nome_cliente_bling)
-        # cliente_db = Contato.objects.get()
 
-        c = Contato.objects.get(nome='Don Adega Goiatuba')
-        print(c)
+        # # identifica o cliente que fez o pedido
+        # # e obtém o mesmo do banco de dados
+        # nome_contato = Contato.objects.filter(nome=nome_cliente_bling).order_by('id').first()
+        # print(nome_contato.id)
 
-        # pedido.cliente = Contato.objects.get(nome=nome_cliente_bling)
-        # pedido.save()
-coloca_pedidos_no_banco()
+        pedido_db = Pedido.objects.create(
+                        data = pedido_bling['data']
+        )
+
+        pedido_db.save()
+
+        if "itens" in pedido_bling:
+            itens_bling = pedido_bling['itens']
+            print("Itens:")
+            for item in itens_bling:
+                item = item['item']
+                item_db = Item.objects.create(
+                            codigo = item['codigo'],
+                            descricao = item['descricao'],
+                            quantidade = item['quantidade'],
+                            valor_unidade = item['valor_unidade'],
+                            preco_custo = item['preco_custo'],
+                            desconto_item = item['desconto_item'],
+                            peso_bruto = item['peso_bruto'],
+                            largura = item['largura'],
+                            altura = item['altura'],
+                            profundidade = item['profundidade'],
+                            unidade_medida = item['unidade_medida'],
+                            gtin = item['gtin'],
+                            pedido = pedido_db.id,
+                )
+                item_db.save()
+
+        # nome_contato = Contato.objects.filter(nome=nome_cliente_bling).order_by('id').first()
+        # print(nome_contato.id)
+        break
+
+
+coloca_pedidos_no_banco(1)
