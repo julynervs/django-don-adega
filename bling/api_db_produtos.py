@@ -141,13 +141,14 @@ def coloca_produtos_no_banco(pagina):
             sleep(0.1)
             print(f"- Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
             
-
-paginas = 250
-for pagina in range(1, paginas):
-    try:
-        coloca_produtos_no_banco(pagina)
-    except KeyError:
-        print("Não tem mais produtos para cadastrar.")
-        break
-    else:
-        print(f"{pagina} páginas foram cadastradas.")
+def main():
+    paginas = 250
+    for pagina in range(1, paginas):
+        try:
+            coloca_produtos_no_banco(pagina)
+        except KeyError:
+            print("Não tem mais produtos para cadastrar.")
+            break
+        else:
+            print(f"{pagina} páginas foram cadastradas.")
+main()

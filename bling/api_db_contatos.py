@@ -104,15 +104,14 @@ def coloca_contatos_no_banco(pagina):
             tipo_contato_db.save()
             sleep(0.2)
 
-paginas = 250
-for pagina in range(paginas):
-    try:
-        coloca_contatos_no_banco(pagina)
-    except KeyError:
-        print("Não tem mais contatos para cadastrar.")
-        break
-    else:
-        print(f"{pagina} páginas foram cadastradas.")
-
-# nome_contato = coloca_contato_no_banco(1)
-# print(f"Contato {nome_contato} cadastrado")
+def main():
+    paginas = 250
+    for pagina in range(paginas):
+        try:
+            coloca_contatos_no_banco(pagina)
+        except KeyError:
+            print("Não tem mais contatos para cadastrar.")
+            break
+        else:
+            print(f"{pagina} páginas foram cadastradas.")
+main()
