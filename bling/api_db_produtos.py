@@ -21,10 +21,10 @@ def get_produtos(pagina):
     'Content-Type': 'application/x-www-form-urlencoded'
     }
     response = requests.request("GET", url, headers=headers, data=payload)
-    print(f"Requisição da página {pagina} feita com sucesso!")
+    sleep(0.5)
     return response.text
 
-def coloca_produto_no_banco(pagina):
+def coloca_produtos_no_banco(pagina):
     """
     Função que recebe o retorno de get_produtos(),
     faz o tratamento dos dados do JSON
@@ -41,6 +41,11 @@ def coloca_produto_no_banco(pagina):
     json = json.loads(get_produtos(pagina))
     sleep(0.5)
     lista_produtos = json['retorno']['produtos']
+
+    print("\n")
+    print("#"*10)
+    print(f"Página {pagina}")
+    print("#"*10)
 
     # percorre a lista de todos os produtos
     for n in range(len(lista_produtos)):
@@ -79,8 +84,9 @@ def coloca_produto_no_banco(pagina):
                 sped_tipo_item = produto_bling['spedTipoItem']
             )
             kit_db.save()
-            print(f"Produto {produto_bling['descricao']} da página {pagina} inserido no banco de dados")
-            # cria tabela de categoria dos kits
+            sleep(0.1)
+            
+            # # cria tabela de categoria dos kits
             categoria_bling = lista_produtos[n]['produto']['categoria']
             categoria_db = CategoriaProdutoKit.objects.create(
                 id_bling = categoria_bling['id'], 
@@ -88,7 +94,8 @@ def coloca_produto_no_banco(pagina):
                 produto_kit = kit_db
             )
             categoria_db.save()
-            print(f"Categoria {categoria_bling['descricao']} da página {pagina} inserida no banco de dados")
+            sleep(0.1)
+            print(f"- Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
         else:
             # cria um objeto (linha) da tabela produto no Django
             # insere os dados do bling no modelo e salva
@@ -121,9 +128,9 @@ def coloca_produto_no_banco(pagina):
                 sped_tipo_item = produto_bling['spedTipoItem']
             )
             produto_db.save()
-            print(f"Produto {produto_bling['descricao']} da página {pagina} inserido no banco de dados")
-
-            # cria tabela de categoria dos produtos
+            sleep(0.1)
+            
+            # # cria tabela de categoria dos produtos
             categoria_bling = lista_produtos[n]['produto']['categoria']
             categoria_db = CategoriaProduto.objects.create(
                 id_bling = categoria_bling['id'], 
@@ -131,13 +138,16 @@ def coloca_produto_no_banco(pagina):
                 produto = produto_db
             )
             categoria_db.save()
-            print(f"Categoria {categoria_bling['descricao']} da página {pagina} inserida no banco de dados")
+            sleep(0.1)
+            print(f"- Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
+            
 
-pagina = 1
-while True:
-    try:     
-        coloca_produto_no_banco(pagina)
-        sleep(1)
-        pagina += 1
-    except Exception as e:
-        print (e)
+paginas = 250
+for pagina in range(1, paginas):
+    try:
+        coloca_produtos_no_banco(pagina)
+    except KeyError:
+        print("Não tem mais produtos para cadastrar.")
+        break
+    else:
+        print(f"{pagina} páginas foram cadastradas.")
