@@ -142,7 +142,7 @@ class Pedido(models.Model):
 class Item(models.Model):
     codigo = models.CharField(max_length=60, default="")
     descricao = models.CharField(max_length=120, default="", null=True)
-    quantidade = models.PositiveIntegerField(null=True)
+    quantidade = models.DecimalField(max_digits=11, decimal_places=4, default=0.0000, null=True)
     valor_unidade = models.DecimalField(max_digits=17, decimal_places=10, null=True)
     preco_custo = models.DecimalField(max_digits=17, decimal_places=10, default=0, null=True)
     desconto_item = models.DecimalField(max_digits=11, decimal_places=3, default=0.000, null=True)
