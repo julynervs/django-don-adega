@@ -47,7 +47,6 @@ def coloca_pedidos_no_banco(pagina):
     print(f"Página {pagina}")
     print("#"*10)
 
-    c = []
     # percorre a lista de todos os pedidos
     for n in range(len(lista_pedidos)):
         pedido_bling = lista_pedidos[n]['pedido']
@@ -61,11 +60,24 @@ def coloca_pedidos_no_banco(pagina):
         cliente_db = Contato.objects.filter(nome=nome_cliente_bling).order_by('id').first()
 
         pedido_db = Pedido.objects.create(
-                        data = pedido_bling['data'],
                         cliente = cliente_db,
+                        data = pedido_bling['data'],
+                        numero = pedido_bling['numero'],
+                        vendedor = pedido_bling['vendedor'],
+                        valorfrete = pedido_bling['vlr_frete'],
+                        desconto = pedido_bling['vlr_desconto'],
+                        total_produtos = pedido_bling['totalprodutos'],
+                        total_venda = pedido_bling['totalvenda'],
+                        situacao = pedido_bling['situacao'],
+                        data_saida = pedido_bling['dataSaida'],
+                        loja = pedido_bling['loja'],
+                        numero_pedido_loja = pedido_bling['numeroPedidoLoja'],
+                        tipo_intgracao = pedido_bling['tipoIntegracao']
         )
 
         pedido_db.save()
+        sleep(0.1)
+        print(f"# Pedido {n} {pedido_bling['numero']}, Cliente {cliente_db.nome} cadastrado")
 
         if "itens" in pedido_bling:
             itens_bling = pedido_bling['itens']
@@ -88,8 +100,19 @@ def coloca_pedidos_no_banco(pagina):
                             pedido = pedido_db,
                 )
                 item_db.save()
+                print(f"- {item}")
+                sleep(0.1)
 
-        break
 
-
-coloca_pedidos_no_banco(1)
+            
+def main():
+    paginas = 250
+    for pagina in range(1, paginas):
+        try:
+            coloca_pedidos_no_banco(pagina)
+        except KeyError:
+            print("Não tem mais produtos para cadastrar.")
+            break
+        else:
+            print(f"{pagina} páginas foram cadastradas.")
+main()
