@@ -29,7 +29,7 @@ def get_pedidos():
 
 def coloca_pedido_no_banco():
     """
-    Função que recebe o retorno de get_contatos(),
+    Esta função recebe o retorno de get_contatos(),
     faz o tratamento dos dados do JSON
     e salva essas informações no banco de dados do Django
     """
