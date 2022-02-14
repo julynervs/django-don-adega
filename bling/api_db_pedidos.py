@@ -13,6 +13,21 @@ import donadega.settings
 import donadega.wsgi
 
 from time import sleep
+import logging
+
+logging.basicConfig(
+            filename='api_db_pedidos.log', encoding='utf-8', level=logging.INFO,
+            format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
+
+### LOGGING ###
+# Nível  |  Quando é usando
+# DEBUG -> Informação detalhada, tipicamente de interesse apenas quando diagnosticando problemas.
+# INFO -> Confirmação de que as coisas estão funcionando como esperado.
+# WARNING -> Uma indicação que algo inesperado aconteceu, ou um indicativo que algum problema 
+#            em um futuro próximo (ex.: ‘pouco espaço em disco’). 
+#            O software está ainda funcionando como esperado.
+# ERROR -> Por conta de um problema mais grave, o software não conseguiu executar alguma função.
+# CRITICAL -> Um erro grave, indicando que o programa pode não conseguir continuar rodando.
 
 def get_pedidos(pagina):
     """
@@ -77,7 +92,8 @@ def coloca_pedidos_no_banco(pagina):
 
         pedido_db.save()
         sleep(0.1)
-        print(f"\n# Pedido {n} {pedido_bling['numero']}, Cliente {cliente_db.nome} cadastrado")
+        logging.info(f"# Página {pagina}: Pedido {n} {pedido_bling['numero']} cadastrado")
+        print(f"# Pedido {n} {pedido_bling['numero']}, Cliente {cliente_db.nome} cadastrado")
 
         if "itens" in pedido_bling:
             itens_bling = pedido_bling['itens']
@@ -106,11 +122,8 @@ def coloca_pedidos_no_banco(pagina):
                 )
                 item_db.save()
                 print(f"- {item['descricao']}")
-                
-
-
-            
 def main():
+
     paginas = 250
     for pagina in range(7, paginas):
         # try:

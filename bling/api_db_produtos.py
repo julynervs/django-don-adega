@@ -14,7 +14,7 @@ import donadega.wsgi
 import logging
 
 logging.basicConfig(
-            filename='bs_mercado_pago.log', encoding='utf-8', level=logging.INFO,
+            filename='api_db_produtos.log', encoding='utf-8', level=logging.INFO,
             format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
 
 ### LOGGING ###
@@ -106,7 +106,8 @@ def coloca_produtos_no_banco(pagina):
             )
             categoria_db.save()
             sleep(0.1)
-            logging.info(f"- Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
+            logging.info(f"Página {pagina}: Produto {n} {produto_bling['codigo']} cadastrado")
+            print(f"- Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
         else:
             # cria um objeto (linha) da tabela produto no Django
             # insere os dados do bling no modelo e salva
@@ -150,7 +151,8 @@ def coloca_produtos_no_banco(pagina):
             )
             categoria_db.save()
             sleep(0.1)
-            logging.info(f"- Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
+            logging.info(f"Página {pagina}: Produto {n} {produto_bling['codigo']} cadastrado")
+            print(f"- Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
             
 def main():
     paginas = 250
@@ -158,8 +160,8 @@ def main():
         try:
             coloca_produtos_no_banco(pagina)
         except KeyError:
-            logging.error("Não tem mais produtos para cadastrar.")
-            break
+            print("Não tem mais produtos para cadastrar.")
+            logging.error("Chave não encontrada no json. Sem produtos para cadastrar.")
         else:
             logging.info(f"{pagina} páginas foram cadastradas.")
 main()

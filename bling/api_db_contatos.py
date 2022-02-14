@@ -13,6 +13,22 @@ sys.path.insert(1, os.path.abspath("."))
 
 import donadega.settings
 import donadega.wsgi
+import logging
+
+logging.basicConfig(
+            filename='api_db_contatos.log', encoding='utf-8', level=logging.INFO,
+            format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
+
+### LOGGING ###
+# Nível  |  Quando é usando
+# DEBUG -> Informação detalhada, tipicamente de interesse apenas quando diagnosticando problemas.
+# INFO -> Confirmação de que as coisas estão funcionando como esperado.
+# WARNING -> Uma indicação que algo inesperado aconteceu, ou um indicativo que algum problema 
+#            em um futuro próximo (ex.: ‘pouco espaço em disco’). 
+#            O software está ainda funcionando como esperado.
+# ERROR -> Por conta de um problema mais grave, o software não conseguiu executar alguma função.
+# CRITICAL -> Um erro grave, indicando que o programa pode não conseguir continuar rodando.
+
 
 def get_contatos(pagina):
     """
