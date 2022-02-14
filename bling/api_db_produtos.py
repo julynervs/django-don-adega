@@ -6,13 +6,27 @@ para o banco de dados sqlite do Django.
 import requests
 import os
 import sys
-
 from time import sleep
 
 sys.path.insert(1, os.path.abspath("."))
-
 import donadega.settings
 import donadega.wsgi
+import logging
+
+logging.basicConfig(
+            filename='bs_mercado_pago.log', encoding='utf-8', level=logging.INFO,
+            format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
+
+### LOGGING ###
+# Nível  |  Quando é usando
+# DEBUG -> Informação detalhada, tipicamente de interesse apenas quando diagnosticando problemas.
+# INFO -> Confirmação de que as coisas estão funcionando como esperado.
+# WARNING -> Uma indicação que algo inesperado aconteceu, ou um indicativo que algum problema 
+#            em um futuro próximo (ex.: ‘pouco espaço em disco’). 
+#            O software está ainda funcionando como esperado.
+# ERROR -> Por conta de um problema mais grave, o software não conseguiu executar alguma função.
+# CRITICAL -> Um erro grave, indicando que o programa pode não conseguir continuar rodando.
+
 
 def get_produtos(pagina):
     url = f"https://bling.com.br/Api/v2/produtos/page={pagina}/json/?apikey=a46ebb16b15e9fdfade2817a3b346942fabe8320811de301aa81b5cbde6feb6d864c1d19"
@@ -50,8 +64,6 @@ def coloca_produtos_no_banco(pagina):
     for n in range(len(lista_produtos)):
         produto_bling = lista_produtos[n]['produto']
         chaves = list(lista_produtos[n]['produto'].keys())
-
-        # print(produto_bling)
 
         if 'estrutura' in chaves:
             kit_db = ProdutoKit.objects.create(
@@ -94,7 +106,7 @@ def coloca_produtos_no_banco(pagina):
             )
             categoria_db.save()
             sleep(0.1)
-            print(f"- Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
+            logging.info(f"- Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
         else:
             # cria um objeto (linha) da tabela produto no Django
             # insere os dados do bling no modelo e salva
@@ -138,7 +150,7 @@ def coloca_produtos_no_banco(pagina):
             )
             categoria_db.save()
             sleep(0.1)
-            print(f"- Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
+            logging.info(f"- Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
             
 def main():
     paginas = 250
@@ -146,8 +158,8 @@ def main():
         try:
             coloca_produtos_no_banco(pagina)
         except KeyError:
-            print("Não tem mais produtos para cadastrar.")
+            logging.error("Não tem mais produtos para cadastrar.")
             break
         else:
-            print(f"{pagina} páginas foram cadastradas.")
+            logging.info(f"{pagina} páginas foram cadastradas.")
 main()
