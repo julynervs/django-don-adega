@@ -68,6 +68,11 @@ def coloca_pedidos_no_banco(pagina):
         chaves = list(lista_pedidos[n]['pedido'].keys())
         # print(pedido_bling)
         # break
+
+        for chave, valor in pedido_bling.items():
+            if valor == '':
+                pedido_bling[chave] = None
+
         nome_cliente_bling = pedido_bling['cliente']['nome']
 
         # # identifica o cliente que fez o pedido

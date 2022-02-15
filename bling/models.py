@@ -55,11 +55,11 @@ class Produto(models.Model):
     cest = models.CharField(max_length=7, default="", null=True)
     marca = models.CharField(max_length=40, default="", null=True)
     condicao = models.CharField(max_length=40, default="", null=True)
-    frete_gratis = models.CharField(max_length=1, default="", null=True)
+    frete_gratis = models.CharField(max_length=1, default="", null=True) # S/N
     linkExterno = models.CharField(max_length=100, default="", null=True)
     nome_fornecedor = models.CharField(max_length=100, default="", null=True)
     codigo_fabricante = models.CharField(max_length=255, default="", null=True)
-    data_validade = models.CharField(max_length=10, default="", null=True)
+    data_validade = models.DateField(null=True, blank=True) # datetime.date
     origem = models.CharField(max_length=1, default="", null=True)
     descricao_fornecedor = models.CharField(max_length=255, default="", null=True)
     id_fabricante = models.CharField(max_length=20, default="", null=True)
@@ -69,8 +69,8 @@ class Produto(models.Model):
     unidade_medida = models.CharField(max_length=20, default="", null=True)
     producao = models.CharField(max_length=1, default="", null=True)
     sped_tipo_item = models.CharField(max_length=2, default="", null=True)
-    data_alteracao = models.CharField(max_length=30, null=True)
-    data_inclusao = models.CharField(max_length=30, null=True)
+    data_alteracao = models.DateTimeField(null=True, blank=True) # datetime.datetime
+    data_inclusao = models.DateTimeField(null=True, blank=True) # datetime.datetime
     def __str__(self):
         return self.descricao
 
@@ -103,8 +103,8 @@ class ProdutoKit(models.Model):
     profundidade_produto = models.DecimalField(max_digits=6, decimal_places=2, default=0.00, null=True)
     unidade_medida = models.CharField(max_length=20, default="", null=True)
     producao = models.CharField(max_length=1, default="", null=True)
-    data_alteracao = models.CharField(max_length=30, null=True)
-    data_inclusao = models.CharField(max_length=30, null=True)
+    data_alteracao = models.DateTimeField(null=True, blank=True) # datetime.datetime
+    data_inclusao = models.DateTimeField(null=True, blank=True) # datetime.datetime
     sped_tipo_item = models.CharField(max_length=2, default="", null=True)
 
 class CategoriaProduto(models.Model):
@@ -118,8 +118,8 @@ class CategoriaProdutoKit(models.Model):
     produto_kit = models.ForeignKey(ProdutoKit, on_delete=models.DO_NOTHING, default="")
 
 class Pedido(models.Model):
-    data = models.CharField(max_length=30, default="", null=True)
-    data_saida = models.CharField(max_length=30, default="", null=True)
+    data = models.DateField(null=True, blank=True)
+    data_saida = models.DateTimeField(null=True, blank=True)
     numero = models.CharField(max_length=10, default="", null=True)
     numero_loja = models.CharField(max_length=50, default="", null=True)
     vlr_frete = models.DecimalField(max_digits=11, decimal_places=2, default=0.00, null=True)

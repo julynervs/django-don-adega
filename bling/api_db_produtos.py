@@ -65,6 +65,10 @@ def coloca_produtos_no_banco(pagina):
         produto_bling = lista_produtos[n]['produto']
         chaves = list(lista_produtos[n]['produto'].keys())
 
+        for chave, valor in produto_bling.items():
+            if valor == '':
+                produto_bling[chave] = None
+            
         if 'estrutura' in chaves:
             kit_db = ProdutoKit.objects.create(
                 id_bling = produto_bling['id'],
