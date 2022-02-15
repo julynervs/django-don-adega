@@ -1,34 +1,34 @@
 from django.db import models
 
 class Contato(models.Model):
-    id_bling = models.IntegerField(null=True)
-    codigo = models.CharField(max_length=15, default="")
-    nome = models.CharField(max_length=120, default="", null=True)
-    fantasia = models.CharField(max_length=30, default="", null=True)
-    tipo_pessoa = models.CharField(max_length=1, default="", null=True)
-    contribuinte = models.IntegerField(null=True)
-    cpf_cnpj = models.CharField(max_length=18, default="", null=True)
-    ie_rg = models.CharField(max_length=18, default="", null=True)
-    endereco = models.CharField(max_length=100, default="", null=True)
-    numero = models.CharField(max_length=10, default="", null=True)
-    complemento = models.CharField(max_length=100, default="", null=True)
-    bairro = models.CharField(max_length=30, default="", null=True)
-    cep = models.CharField(max_length=10, default="", null=True)
-    cidade = models.CharField(max_length=30, default="", null=True)
-    uf = models.CharField(max_length=2, default="", null=True)
-    fone = models.CharField(max_length=40, default="", null=True)
-    celular = models.CharField(max_length=40, default="", null=True)
-    data_alteracao = models.CharField(max_length=30, null=True)
-    data_inclusao = models.CharField(max_length=30, null=True)
-    cliente_desde = models.CharField(max_length=30, null=True)
-    data_nascimento = models.CharField(max_length=15, null=True)
-    sexo = models.CharField(max_length=30, default="", null=True)
-    site = models.CharField(max_length=80, default="", null=True)
-    email = models.EmailField(max_length=100, default="", null=True)
-    email_nfe = models.EmailField(max_length=100, default="", null=True)
-    situacao = models.CharField(max_length=40, default="", null=True)
-    informacao_contato = models.CharField(max_length=100, default="", null=True)
-    limite_credito = models.DecimalField(max_digits=11, decimal_places=2, null=True)
+    id_bling = models.IntegerField(null=True) # inteiro
+    codigo = models.CharField(max_length=15, default="", null=True, blank=True) # string
+    nome = models.CharField(max_length=120, default="", null=True, blank=False) # string
+    fantasia = models.CharField(max_length=30, default="", null=True, blank=True) # string
+    tipo_pessoa = models.CharField(max_length=1, default="", null=True, blank=False) # char (ex.: "J")
+    contribuinte = models.IntegerField(null=True, blank=False) # inteiro (1 - Contribuinte do ICMS, 2 - Contribuinte isento do ICMS ou 9 - Não contribuinte)
+    cpf_cnpj = models.IntegerField(null=True, unique=True, blank=False) # inteiro 99999999999
+    ie_rg = models.IntegerField(null=True) # inteiro
+    endereco = models.CharField(max_length=100, default="", null=True, blank=True) # string
+    numero = models.CharField(max_length=10, default="", null=True, blank=True)
+    complemento = models.CharField(max_length=100, default="", null=True, blank=True)
+    bairro = models.CharField(max_length=30, default="", null=True, blank=True)
+    cep = models.CharField(max_length=10, default="", null=True, blank=True)
+    cidade = models.CharField(max_length=30, default="", null=True, blank=True)
+    uf = models.CharField(max_length=2, default="", null=True, blank=True)
+    fone = models.CharField(max_length=40, default="", null=True, blank=True)
+    celular = models.CharField(max_length=40, default="", null=True, blank=True)
+    data_alteracao = models.DateTimeField(null=True, blank=True) # datetime.datetime
+    data_inclusao = models.DateTimeField(null=True, blank=True) # datetime.datetime
+    cliente_desde = models.DateField(null=True, blank=True) # datetime.date
+    data_nascimento = models.DateField(null=True, blank=True) # datetime.date
+    sexo = models.CharField(max_length=20, default="", null=True, blank=True) # string
+    site = models.CharField(max_length=80, default="", null=True, blank=True) # string
+    email = models.EmailField(max_length=100, default="", null=True, blank=True) # string
+    email_nfe = models.EmailField(max_length=100, default="", null=True, blank=True) # string
+    situacao = models.CharField(max_length=20, default="", null=True, blank=True) # string
+    informacao_contato = models.CharField(max_length=100, default="", null=True, blank=True)
+    limite_credito = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True) # float
     def __str__(self):
         return self.nome
 
