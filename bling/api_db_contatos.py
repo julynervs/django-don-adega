@@ -6,6 +6,7 @@ para o banco de dados sqlite do Django.
 import requests
 import os
 import sys
+import re
 
 from time import sleep
 
@@ -76,6 +77,11 @@ def coloca_contatos_no_banco(pagina):
 
         print(f"- Contato {n} {contato_bling['nome']} cadastrado")
 
+        # dados vazios
+        for chave, valor in contato_bling.items():
+            if valor == '':
+                contato_bling[chave] = None
+
         # cria um objeto (linha) da tabela Contato no Django
         # insere os dados do bling no modelo e salva
         contato_db = Contato.objects.create(
@@ -108,6 +114,8 @@ def coloca_contatos_no_banco(pagina):
         contato_db.save()
         sleep(0.1)
 
+        # print(contato_bling)
+
         # cria tabela para os tipos de contato
         # define qual contato é cliente e/ou fornecedor e/ou transportador etc
         if 'tiposContato' in chaves:
@@ -122,7 +130,7 @@ def coloca_contatos_no_banco(pagina):
 
 def main():
     paginas = 250
-    for pagina in range(1, paginas):
+    for pagina in range(2, paginas):
         try:
             coloca_contatos_no_banco(pagina)
         except KeyError:

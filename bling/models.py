@@ -1,14 +1,14 @@
 from django.db import models
 
 class Contato(models.Model):
-    id_bling = models.IntegerField(null=True) # inteiro
+    id_bling = models.IntegerField(null=True, blank=True) # inteiro
     codigo = models.CharField(max_length=15, default="", null=True, blank=True) # string
     nome = models.CharField(max_length=120, default="", null=True, blank=False) # string
     fantasia = models.CharField(max_length=30, default="", null=True, blank=True) # string
     tipo_pessoa = models.CharField(max_length=1, default="", null=True, blank=False) # char (ex.: "J")
     contribuinte = models.IntegerField(null=True, blank=False) # inteiro (1 - Contribuinte do ICMS, 2 - Contribuinte isento do ICMS ou 9 - Não contribuinte)
-    cpf_cnpj = models.IntegerField(null=True, unique=True, blank=False) # inteiro 99999999999
-    ie_rg = models.IntegerField(null=True) # inteiro
+    cpf_cnpj = models.CharField(max_length=18, default="", null=True, blank=True)
+    ie_rg = models.CharField(max_length=18, default="", null=True, blank=True) # str
     endereco = models.CharField(max_length=100, default="", null=True, blank=True) # string
     numero = models.CharField(max_length=10, default="", null=True, blank=True)
     complemento = models.CharField(max_length=100, default="", null=True, blank=True)
