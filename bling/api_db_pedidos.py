@@ -57,6 +57,7 @@ def coloca_pedidos_no_banco(pagina):
     json = json.loads(get_pedidos(pagina))
     lista_pedidos = json['retorno']['pedidos']
 
+    # somente visualização
     print("\n")
     print("#"*10)
     print(f"Página {pagina}")
@@ -66,77 +67,100 @@ def coloca_pedidos_no_banco(pagina):
     for n in range(len(lista_pedidos)):
         pedido_bling = lista_pedidos[n]['pedido']
         chaves = list(lista_pedidos[n]['pedido'].keys())
-        # print(pedido_bling)
-        # break
 
-        for chave, valor in pedido_bling.items():
-            if valor == '':
-                pedido_bling[chave] = None
+        if pedido_bling != None:
 
-        nome_cliente_bling = pedido_bling['cliente']['nome']
+            pedido_bling_copy = {**pedido_bling}
+            nome_cliente_bling = pedido_bling['cliente']['nome']
 
-        # # identifica o cliente que fez o pedido
-        # # e obtém o mesmo do banco de dados
-        cliente_db = Contato.objects.filter(nome=nome_cliente_bling).order_by('id').first()
+            for chave, valor in pedido_bling_copy.items():
+                if valor == '':
+                    pedido_bling[chave] = None
+                if "%" in str(valor):
+                    pedido_bling[chave] = pedido_bling[chave].replace('%', '')
+                if 'dataSaida' not in chave:
+                    pedido_bling['dataSaida'] = None
+
+            # # identifica o cliente que fez o pedido
+            # # e obtém o mesmo do banco de dados
+            cliente_db = Contato.objects.filter(nome=nome_cliente_bling).order_by('id').first()
+            
+            # cria objeto Pedido no banco de dados
+            pedido_db = Pedido.objects.create(
+                            cliente = cliente_db,
+                            data = pedido_bling['data'],
+                            numero = pedido_bling['numero'],
+                            vendedor = pedido_bling['vendedor'],
+                            vlr_frete = pedido_bling['valorfrete'],
+                            vlr_desconto = pedido_bling['desconto'].replace(',', '.'),
+                            total_produtos = pedido_bling['totalprodutos'],
+                            total_venda = pedido_bling['totalvenda'],
+                            situacao = pedido_bling['situacao'],
+                            data_saida = pedido_bling['dataSaida'],
+                            # numero_pedido_loja = pedido_bling['numeroPedidoLoja'],
+                            # tipo_integracao = pedido_bling['tipoIntegracao'],
+            )
+
+            # pedido_db.save()
         
-        # cria objeto Pedido no banco de dados
-        pedido_db = Pedido.objects.create(
-                        cliente = cliente_db,
-                        data = pedido_bling['data'],
-                        numero = pedido_bling['numero'],
-                        vendedor = pedido_bling['vendedor'],
-                        vlr_frete = pedido_bling['valorfrete'],
-                        vlr_desconto = pedido_bling['desconto'].replace(',', '.'),
-                        total_produtos = pedido_bling['totalprodutos'],
-                        total_venda = pedido_bling['totalvenda'],
-                        situacao = pedido_bling['situacao'],
-                        data_saida = pedido_bling['dataSaida'],
-                        # numero_pedido_loja = pedido_bling['numeroPedidoLoja'],
-                        # tipo_integracao = pedido_bling['tipoIntegracao'],
-        )
+            sleep(0.1)
+            logging.info(f"# Página {pagina}: Pedido {n} {pedido_bling['numero']} cadastrado")
+            print(f"# Pedido {n} {pedido_bling['numero']}, Cliente {cliente_db.nome} cadastrado")
 
-        pedido_db.save()
-        sleep(0.1)
-        logging.info(f"# Página {pagina}: Pedido {n} {pedido_bling['numero']} cadastrado")
-        print(f"# Pedido {n} {pedido_bling['numero']}, Cliente {cliente_db.nome} cadastrado")
+            if "itens" in pedido_bling:
+                itens_bling = pedido_bling['itens']
+                print("Itens:")
+                for item in itens_bling:
+                    item = item['item']
+                    # valida valores '', quando se espera um numero
+                    for key in item.keys():
+                        if item[key] == '':
+                            item[key] = 0
+                    # # cria objeto Item no banco de dados
+                    # item_db = Item.objects.create(
+                    #             codigo = item['codigo']
+                    # )
+                    # item_db = Item.objects.create(
+                    #             descricao = item['descricao'],
+                    #             quantidade = item['quantidade'],
+                    #             valor_unidade = item['valorunidade'],
+                    #             preco_custo = item['precocusto'],
+                    #             desconto_item = item['descontoItem'],
+                    #             peso_bruto = item['pesoBruto'],
+                    #             largura = item['largura'],
+                    #             altura = item['altura'],
+                    #             profundidade = item['profundidade'],
+                    #             unidade_medida = item['unidadeMedida'],
+                    #             gtin = item['gtin'],
+                    #             # pedido = pedido_db,
+                    # )
+                    
+                    if 'descricao' in item:
+                        item_db = Item.objects.create(
+                            descricao = item['descricao']
+                        )
 
-        if "itens" in pedido_bling:
-            itens_bling = pedido_bling['itens']
-            print("Itens:")
-            for item in itens_bling:
-                item = item['item']
-                # valida valores '', quando se espera um numero
-                for key in item.keys():
-                    if item[key] == '':
-                        item[key] = 0
-                # cria objeto Item no banco de dados
-                item_db = Item.objects.create(
-                            codigo = item['codigo'],
-                            descricao = item['descricao'],
-                            quantidade = item['quantidade'],
-                            valor_unidade = item['valorunidade'],
-                            preco_custo = item['precocusto'],
-                            desconto_item = item['descontoItem'],
-                            peso_bruto = item['pesoBruto'],
-                            largura = item['largura'],
-                            altura = item['altura'],
-                            profundidade = item['profundidade'],
-                            unidade_medida = item['unidadeMedida'],
-                            gtin = item['gtin'],
-                            pedido = pedido_db,
-                )
-                item_db.save()
-                print(f"- {item['descricao']}")
+
+
+
+                    item_db.save()
+                    print(f"- {item['descricao']}")
+        else:
+            pass
+        # print(pedido_bling)
+        break
 def main():
 
     paginas = 250
-    for pagina in range(7, paginas):
-        # try:
-        coloca_pedidos_no_banco(pagina)
-        # except Exception as e:
-        #     print(e)
-        #     print("Não tem mais produtos para cadastrar.")
-        #     break
-        # else:
-        #     print(f"{pagina} páginas foram cadastradas.")
+    for pagina in range(18, paginas):
+        try:
+            coloca_pedidos_no_banco(pagina)
+            break
+        except Exception as e:
+            print(e)
+            logging.error(e)
+            print("Não tem mais produtos para cadastrar.")
+            break
+        else:
+            print(f"{pagina} páginas foram cadastradas.")
 main()

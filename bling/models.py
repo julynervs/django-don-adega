@@ -137,7 +137,7 @@ class Pedido(models.Model):
     # transporte = models.ForeignKey(Contato, default="", on_delete=models.DO_NOTHING, null=True)
     # item = models.ForeignKey(Item, default="", on_delete=models.DO_NOTHING, null=True)
     def __str__(self):
-        return self.cliente
+        return self.numero
 
 class Item(models.Model):
     codigo = models.CharField(max_length=60, default="", null=True, blank=True)

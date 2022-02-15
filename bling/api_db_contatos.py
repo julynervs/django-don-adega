@@ -67,54 +67,85 @@ def coloca_contatos_no_banco(pagina):
     print("#"*10)
 
     # percorre a lista de todos os contatos da requisição (página)
+    contato_db = None
     for n in range(len(lista_contatos)):
         contato_bling = lista_contatos[n]['contato']
         # infos do contato
         chaves = list(lista_contatos[n]['contato'].keys())
 
-        if not 'dataNacimento' in chaves:
-            contato_bling['dataNascimento'] = ""
-
         print(f"- Contato {n} {contato_bling['nome']} cadastrado")
+        logging.info(f"_Contato {n} {contato_bling['nome']} cadastrado")
 
-        # dados vazios
-        for chave, valor in contato_bling.items():
-            if valor == '':
-                contato_bling[chave] = None
+        # filtro
+        def valor_correto_ou_nada(chave):
+            if contato_bling[chave] == '':
+                logging.warning(f"____{chave} do contato {contato_bling['nome']} incorreta ou não existente, None definido no campo")
+                return None
+            else:
+                logging.info(f"____{chave} do contato {contato_bling['nome']} cadastrada")
+                return contato_bling[chave]
 
-        # cria um objeto (linha) da tabela Contato no Django
-        # insere os dados do bling no modelo e salva
+        # filtro para existencia de um dado no JSON do Bling
+        def chave_existe(chave_bling):
+            if chave_bling in contato_bling.keys():
+                return True
+            else:
+                return False
+
+        # cadastro campos de string
+        contato_db = Contato.objects.create(codigo = valor_correto_ou_nada('codigo'))
+
         contato_db = Contato.objects.create(
-            id_bling = contato_bling['id'],
-            codigo = contato_bling['codigo'],
-            nome = contato_bling['nome'],
-            fantasia = contato_bling['fantasia'],
-            tipo_pessoa = contato_bling['tipo'],
-            cpf_cnpj = contato_bling['cnpj'],
-            ie_rg = contato_bling['ie_rg'],
-            endereco = contato_bling['endereco'],
-            numero = contato_bling['numero'],
-            bairro = contato_bling['bairro'],
-            cep = contato_bling['cep'],
-            cidade = contato_bling['cidade'],
-            complemento = contato_bling['complemento'],
-            uf = contato_bling['uf'],
-            fone = contato_bling['fone'],
-            email = contato_bling['email'],
-            situacao = contato_bling['situacao'],
-            contribuinte = contato_bling['contribuinte'],
-            site = contato_bling['site'],
-            celular = contato_bling['celular'],
-            data_alteracao = contato_bling['dataAlteracao'],
-            data_inclusao = contato_bling['dataInclusao'],
-            sexo = contato_bling['sexo'],
-            cliente_desde = contato_bling['clienteDesde'],
-            limite_credito = contato_bling['limiteCredito']
+                    nome = valor_correto_ou_nada('nome'),
+                    fantasia = valor_correto_ou_nada('fantasia'),
+                    tipo_pessoa = valor_correto_ou_nada('tipo'),
+                    cpf_cnpj = valor_correto_ou_nada('cnpj'),
+                    ie_rg = valor_correto_ou_nada('ie_rg'),
+                    endereco = valor_correto_ou_nada('endereco'),
+                    numero = valor_correto_ou_nada('numero'),
+                    bairro = valor_correto_ou_nada('bairro'),
+                    cep = valor_correto_ou_nada('cep'),
+                    cidade = valor_correto_ou_nada('cidade'),
+                    complemento = valor_correto_ou_nada('complemento'),
+                    uf = valor_correto_ou_nada('uf'),
+                    fone = valor_correto_ou_nada('fone'),
+                    situacao = valor_correto_ou_nada('situacao'),
+                    site = valor_correto_ou_nada('site'),
+                    celular = valor_correto_ou_nada('celular'),            
+                    sexo = valor_correto_ou_nada('sexo'),
         )
+
+        # cadastro campos numéricos
+        ## int
+        contato_db = Contato.objects.create(id_bling = contato_bling['id'])
+        contato_db = Contato.objects.create(contribuinte = contato_bling['contribuinte'])
+        ## float
+        contato_db = Contato.objects.create(limite_credito = contato_bling['limiteCredito'])
+
+        # email
+        contato_db = Contato.objects.create(email = contato_bling['email'])
+
+        # filtro para datas corretas, caso no Bling tenho um cadastro com uma data que não existe
+        def data_correta_ou_nada(chave_data):
+            if contato_bling[chave_data] == '0000-00-00' or contato_bling[chave_data] == '':
+                logging.warning(f"____{chave_data} do contato {contato_bling['nome']} incorreta ou não existente, None definido no campo")
+                return None
+            else:
+                logging.info(f"____{chave_data} do contato {contato_bling['nome']} cadastrada")
+                return contato_bling[chave_data]
+
+        # cadastro campos de data
+        for chave_lista in ['dataInclusao', 'dataAlteracao', 'clienteDesde', 'dataNascimento']:
+            # verifica existencia do campo
+            if chave_existe(chave_lista):
+                contato_db = Contato.objects.create(data_inclusao = data_correta_ou_nada(chave_lista))
+            # se o campo não existe no JSON, o dado não é cadastrado no banco de dados
+            else:
+                logging.info(f"____O campo '{chave_lista}' não foi cadastrado por não existe no json")
+    
         contato_db.save()
         sleep(0.1)
-
-        # print(contato_bling)
+        print(contato_bling)
 
         # cria tabela para os tipos de contato
         # define qual contato é cliente e/ou fornecedor e/ou transportador etc
@@ -130,11 +161,16 @@ def coloca_contatos_no_banco(pagina):
 
 def main():
     paginas = 250
-    for pagina in range(2, paginas):
+    for pagina in range(1, paginas):
         try:
             coloca_contatos_no_banco(pagina)
         except KeyError:
-            print("Não tem mais contatos para cadastrar.")
+            print("Algo aconteceu ou não tem mais contatos para cadastrar.")
+            logging.warning(KeyError)
+            break
+        except Exception as e:
+            print(e)
+            logging.warning(e)
             break
         else:
             print(f"{pagina} páginas foram cadastradas.")
