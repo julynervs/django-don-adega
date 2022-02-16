@@ -41,7 +41,7 @@ class TipoContato(models.Model):
 
 class Produto(models.Model):
     id_bling = models.IntegerField(null=True)
-    codigo = models.CharField(max_length=60, default="")
+    codigo = models.CharField(max_length=60, default="", null=True, blank=True)
     descricao = models.CharField(max_length=120, default="", null=True)
     tipo = models.CharField(max_length=1, default="", null=True)
     situacao = models.CharField(max_length=18, default="", null=True)
