@@ -126,7 +126,7 @@ def coloca_produtos_no_banco(pagina):
             )
             categoria_db.save()
             sleep(0.1)
-            logging.info(f"Página {pagina}: Produto {n} {produto_bling['codigo']} cadastrado")
+            logging.info(f"_Página {pagina}: Produto {n} {produto_bling['codigo']} cadastrado")
             print(f"- Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
         else:
             # cria um objeto (linha) da tabela produto no Django
