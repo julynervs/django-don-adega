@@ -50,10 +50,14 @@ def coloca_produtos_no_banco(pagina):
     from bling.models import CategoriaProduto
     from bling.models import CategoriaProdutoKit
 
-    # get_mais_produtos(pagina)
+    # get_produtos(pagina)
     # formata json recebido
     json = json.loads(get_produtos(pagina))
     lista_produtos = json['retorno']['produtos']
+
+    if '"produto"' not in lista_produtos:
+        logging.warning(get_produtos(pagina))
+        # print(get_produtos(pagina))
 
     print("\n")
     print("#"*10)
@@ -65,14 +69,10 @@ def coloca_produtos_no_banco(pagina):
         produto_bling = lista_produtos[n]['produto']
         chaves = list(lista_produtos[n]['produto'].keys())
 
-        # for chave, valor in produto_bling.items():
-        #     if valor == '':
-        #         produto_bling[chave] = None
-            
         # filtro
         def valor_correto_ou_nada(chave):
             if produto_bling[chave] == '':
-                logging.warning(f"____{chave} do produto {n} {produto_bling['nome']} incorreta ou não existente, None definido no campo")
+                logging.warning(f"____{chave} do produto {n} {produto_bling['descricao']} incorreta ou não existente, None definido no campo")
                 return None
             else:
                 logging.info(f"____{chave} do produto {n} cadastrada")
@@ -86,36 +86,56 @@ def coloca_produtos_no_banco(pagina):
                 return False    
 
         if 'estrutura' in chaves:
+            # cadastro de campos datas
+            kit_db = ProdutoKit.objects.create(data_alteracao = valor_correto_ou_nada('dataAlteracao'))
+            if chave_existe('dataInclusao'):
+                kit_db = ProdutoKit.objects.create(data_inclusao = valor_correto_ou_nada('dataInclusao'))
+            else:
+                logging.info(f"____O campo 'dataInclusao' NÃO foi cadastrado por não existir no json")
+
+            # cadastro de campos numéricos
+            ## int
+            kit_db = ProdutoKit.objects.create(id_bling = valor_correto_ou_nada('id'))
+            logging.info(f"____id_bling do produto Kit {n} cadastrado")
+            ## float
+            kit_db = ProdutoKit.objects.create(preco = valor_correto_ou_nada('preco'))
+            logging.info(f"____preco do produto Kit {n} cadastrado")
+            
+            kit_db = ProdutoKit.objects.create(preco_custo = valor_correto_ou_nada('precoCusto'))
+            logging.info(f"____preco_custo do produto Kit {n} cadastrado")
+            
+            kit_db = ProdutoKit.objects.create(largura_produto = valor_correto_ou_nada('larguraProduto'))
+            logging.info(f"____largura_produto do produto Kit {n} cadastrado")
+            
+            kit_db = ProdutoKit.objects.create(altura_produto = valor_correto_ou_nada('alturaProduto'))
+            logging.info(f"____altura_produto do produto Kit {n} cadastrado")
+            
+            kit_db = ProdutoKit.objects.create(profundidade_produto = valor_correto_ou_nada('profundidadeProduto'))
+            logging.info(f"____profundidade_produto do produto Kit {n} cadastrado")
+            
+            # cadastro campos texto
             kit_db = ProdutoKit.objects.create(
-                id_bling = produto_bling['id'],
-                codigo = produto_bling['codigo'],
-                descricao = produto_bling['descricao'],
-                tipo = produto_bling['tipo'],
-                situacao = produto_bling['situacao'],
-                unidade = produto_bling['unidade'],
-                preco = produto_bling['preco'],
-                preco_custo = produto_bling['precoCusto'],
-                data_alteracao = produto_bling['dataAlteracao'],
-                data_inclusao = produto_bling['dataInclusao'],
-                nome_fornecedor = produto_bling['nomeFornecedor'],
-                codigo_fabricante  = produto_bling['codigoFabricante'],
-                marca = produto_bling['marca'],
-                class_fiscal = produto_bling['class_fiscal'],
-                cest = produto_bling['cest'],
-                origem = produto_bling['origem'],
-                descricao_fornecedor = produto_bling['descricaoFornecedor'],
-                id_fabricante = produto_bling['idFabricante'],
-                largura_produto = produto_bling['larguraProduto'],
-                altura_produto = produto_bling['alturaProduto'],
-                profundidade_produto = produto_bling['profundidadeProduto'],
-                unidade_medida = produto_bling['unidadeMedida'],
-                condicao = produto_bling['condicao'],
-                frete_gratis = produto_bling['freteGratis'],
-                producao = produto_bling['producao'],
-                sped_tipo_item = produto_bling['spedTipoItem']
+                descricao = valor_correto_ou_nada('descricao'))
+            kit_db = ProdutoKit.objects.create(
+                codigo = valor_correto_ou_nada('codigo'),
+                tipo = valor_correto_ou_nada('tipo'),
+                situacao = valor_correto_ou_nada('situacao'),
+                unidade = valor_correto_ou_nada('unidade'),
+                nome_fornecedor = valor_correto_ou_nada('nomeFornecedor'),
+                codigo_fabricante  = valor_correto_ou_nada('codigoFabricante'),
+                marca = valor_correto_ou_nada('marca'),
+                class_fiscal = valor_correto_ou_nada('class_fiscal'),
+                cest = valor_correto_ou_nada('cest'),
+                origem = valor_correto_ou_nada('origem'),
+                descricao_fornecedor = valor_correto_ou_nada('descricaoFornecedor'),
+                id_fabricante = valor_correto_ou_nada('idFabricante'),
+                unidade_medida = valor_correto_ou_nada('unidadeMedida'),
+                condicao = valor_correto_ou_nada('condicao'),
+                frete_gratis = valor_correto_ou_nada('freteGratis'),
+                producao = valor_correto_ou_nada('producao'),
+                sped_tipo_item = valor_correto_ou_nada('spedTipoItem')
             )
             kit_db.save()
-            sleep(0.1)
             
             # # cria tabela de categoria dos kits
             categoria_bling = lista_produtos[n]['produto']['categoria']
@@ -125,9 +145,9 @@ def coloca_produtos_no_banco(pagina):
                 produto_kit = kit_db
             )
             categoria_db.save()
-            sleep(0.1)
-            logging.info(f"_Página {pagina}: Produto {n} {produto_bling['codigo']} cadastrado")
-            print(f"- Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
+
+            logging.info(f"_Página {pagina}: ProdutoKit {n} {produto_bling['codigo']} cadastrado")
+            print(f"- ProdutoKit {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
         else:
             # cria um objeto (linha) da tabela produto no Django
             # insere os dados do bling no modelo e salva
@@ -135,17 +155,31 @@ def coloca_produtos_no_banco(pagina):
             # cadastro campos numéricos
             ## int
             produto_db = Produto.objects.create(id_bling = valor_correto_ou_nada('id'))
+            logging.info(f"____id_bling do produto {n} cadastrado")
+            
             ## float
             produto_db = Produto.objects.create(preco = valor_correto_ou_nada('preco'))
-            produto_db = Produto.objects.create(preco_custo = valor_correto_ou_nada('precoCusto'))
-            produto_db = Produto.objects.create(largura_produto = valor_correto_ou_nada('larguraProduto'))
-            produto_db = Produto.objects.create(altura_produto = valor_correto_ou_nada('alturaProduto'))
-            produto_db = Produto.objects.create(profundidade_produto = valor_correto_ou_nada('profundidadeProduto'))
+            logging.info(f"____preco do produto {n} cadastrado")
             
+            produto_db = Produto.objects.create(preco_custo = valor_correto_ou_nada('precoCusto'))
+            logging.info(f"____preco_custo do produt  {n} cadastrado")
+            
+            produto_db = Produto.objects.create(largura_produto = valor_correto_ou_nada('larguraProduto'))
+            logging.info(f"____largura_produto do produto {n} cadastrado")
+            
+            produto_db = Produto.objects.create(altura_produto = valor_correto_ou_nada('alturaProduto'))
+            logging.info(f"____altura_produto do produto {n} cadastrado")
+            
+            produto_db = Produto.objects.create(profundidade_produto = valor_correto_ou_nada('profundidadeProduto'))
+            logging.info(f"____profundidade_produto do produto {n} cadastrado")
             
             # cadastro campos data
             produto_db = Produto.objects.create(data_alteracao = valor_correto_ou_nada('dataAlteracao'))
+            logging.info(f"____data_alteracao do produto {n} cadastrado")
+            
             produto_db = Produto.objects.create(data_inclusao = valor_correto_ou_nada('dataInclusao'))
+            logging.info(f"____data_inclusao do produto {n} cadastrado")
+            
             # cadastro campos texto
             produto_db = Produto.objects.create(
                 codigo = valor_correto_ou_nada('codigo'),
@@ -167,8 +201,8 @@ def coloca_produtos_no_banco(pagina):
                 producao = valor_correto_ou_nada('producao'),
                 sped_tipo_item = valor_correto_ou_nada('spedTipoItem')
             )
+            logging.info(f"____campos de string do produto {n} cadastrado")
             produto_db.save()
-            sleep(0.1)
             
             # # cria tabela de categoria dos produtos
             categoria_bling = lista_produtos[n]['produto']['categoria']
@@ -178,8 +212,8 @@ def coloca_produtos_no_banco(pagina):
                 produto = produto_db
             )
             categoria_db.save()
-            sleep(0.1)
-            logging.info(f"_Página {pagina}: Produto {n} {produto_bling['codigo']} cadastrado")
+
+            logging.info(f"_Página {pagina}: Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
             print(f"- Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
             
 def main():
@@ -187,9 +221,14 @@ def main():
     for pagina in range(1, paginas):
         try:
             coloca_produtos_no_banco(pagina)
-        except KeyError:
-            print("Não tem mais produtos para cadastrar.")
-            logging.error("Chave não encontrada no json. Sem produtos para cadastrar.")
+        except Exception as e:
+            print(e)
+            logging.error(e)
+        # except KeyError:
+        #     print(KeyError)
+        #     logging.error(KeyError)
+        #     logging.error("Chave não encontrada no json.")
+        #     break
         else:
             logging.info(f"{pagina} páginas foram cadastradas.")
 main()
