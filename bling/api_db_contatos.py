@@ -20,51 +20,20 @@ logging.basicConfig(
             filename='api_db_contatos.log', encoding='utf-8', level=logging.INFO,
             format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
 
-### LOGGING ###
-# Nível  |  Quando é usando
-# DEBUG -> Informação detalhada, tipicamente de interesse apenas quando diagnosticando problemas.
-# INFO -> Confirmação de que as coisas estão funcionando como esperado.
-# WARNING -> Uma indicação que algo inesperado aconteceu, ou um indicativo que algum problema 
-#            em um futuro próximo (ex.: ‘pouco espaço em disco’). 
-#            O software está ainda funcionando como esperado.
-# ERROR -> Por conta de um problema mais grave, o software não conseguiu executar alguma função.
-# CRITICAL -> Um erro grave, indicando que o programa pode não conseguir continuar rodando.
+import get_bling
 
-def get_contatos(pagina):
-    """
-    Função que faz requisição GET contatos pela API do bling 
-    """
-    url = f"https://bling.com.br/Api/v2/contatos/page={pagina}/json/?apikey=a46ebb16b15e9fdfade2817a3b346942fabe8320811de301aa81b5cbde6feb6d864c1d19"
-
-    payload='apikey=a46ebb16b15e9fdfade2817a3b346942fabe8320811de301aa81b5cbde6feb6d864c1d19'
-    headers = {
-    'Content-Type': 'application/x-www-form-urlencoded'
-    }
-
-    response = requests.request("GET", url, headers=headers, data=payload)
-    sleep(0.4)
-    return response.text
-
-def coloca_contatos_no_banco(pagina):
+def coloca_contatos_no_banco(retorno_get):
     """
     Função que recebe o retorno de get_contatos(),
     faz o tratamento dos dados do JSON
     e salva essas informações no banco de dados do Django
     """
-    import json
     from bling.models import Contato
     from bling.models import TipoContato
 
-    # formata json recebido
-    json = json.loads(get_contatos(pagina))
     # lista de até 100 contatos, pois é o limite de contatos por requisição do bling
-    lista_contatos = json['retorno']['contatos']
+    lista_contatos = retorno_get['contatos']
    
-    print("\n")
-    print("#"*10)
-    print(f"Página {pagina}")
-    print("#"*10)
-
     # percorre a lista de todos os contatos da requisição (página)
     contato_db = None
     for n in range(len(lista_contatos)):
@@ -116,13 +85,23 @@ def coloca_contatos_no_banco(pagina):
 
         # cadastro campos numéricos
         ## int
-        contato_db = Contato.objects.create(id_bling = contato_bling['id'])
-        logging.info(f"____id_bling do contato {n} cadastrado")
-        contato_db = Contato.objects.create(contribuinte = contato_bling['contribuinte'])
-        logging.info(f"____contribuinte do contato {n} cadastrado")
+        if chave_existe('id'):
+            contato_db =Contato.objects.create(id_bling = valor_correto_ou_nada('id'))
+            logging.info(f"____id_bling do produto Kit {n} cadastrado")
+        else:
+            logging.info(f"____O campo 'id_bling' NÃO foi cadastrado por não existir no json")
+        
+        if chave_existe('contribuinte'):
+            contato_db = Contato.objects.create(contribuinte = contato_bling['contribuinte'])
+            logging.info(f"____contribuinte do contato {n} cadastrado")
+        else:
+            logging.info(f"____O campo 'contribuinte' NÃO foi cadastrado por não existir no json")
         ## float
-        contato_db = Contato.objects.create(limite_credito = contato_bling['limiteCredito'])
-        logging.info(f"____limite_credito do contato {n} cadastrado")
+        if chave_existe('limiteCredito'):
+            contato_db = Contato.objects.create(limite_credito = contato_bling['limiteCredito'])
+            logging.info(f"____limite_credito do contato {n} cadastrado")
+        else:
+            logging.info(f"____O campo 'contribuinte' NÃO foi cadastrado por não existir no json")
         # email
         contato_db = Contato.objects.create(email = contato_bling['email'])
         logging.info(f"____email do contato {n} cadastrado")
@@ -142,21 +121,25 @@ def coloca_contatos_no_banco(pagina):
         # se o campo não existe no JSON, o dado não é cadastrado no banco de dados
         if chave_existe('dataInclusao'):
             contato_db = Contato.objects.create(data_inclusao = data_correta_ou_nada('dataInclusao'))
+            logging.info(f"____data_inclusao do contato {n} cadastrado")
         else:
             logging.info(f"____O campo 'dataInclusao' não foi cadastrado por não existir no json")
 
         if chave_existe('dataAlteracao'):
             contato_db = Contato.objects.create(data_alteracao = data_correta_ou_nada('dataAlteracao'))
+            logging.info(f"____data_alteracao do contato {n} cadastrado")
         else:
             logging.info(f"____O campo 'dataAlteracao' não foi cadastrado por não existir no json")
 
         if chave_existe('clienteDesde'):
             contato_db = Contato.objects.create(cliente_desde = data_correta_ou_nada('clienteDesde'))
+            logging.info(f"____cliente_desde do contato {n} cadastrado")
         else:
-            logging.info(f"____O campo 'clienteDesde' não foi cadastrado por não existir no json")
+            logging.info(f"____O campo 'cliente_desde' não foi cadastrado por não existir no json")
 
         if chave_existe('dataNascimento'):
             contato_db = Contato.objects.create(data_nascimento = data_correta_ou_nada('dataNascimento'))
+            logging.info(f"____data_nascimento do contato {n} cadastrado")
         else:
             logging.info(f"____O campo 'dataNascimento' não foi cadastrado por não existir no json")
     
@@ -173,21 +156,18 @@ def coloca_contatos_no_banco(pagina):
                 contato=contato_db
             )
             tipo_contato_db.save()
-            # sleep(0.1)
 
 def main():
     paginas = 250
     for pagina in range(1, paginas):
-        try:
-            coloca_contatos_no_banco(pagina)
-        except KeyError:
-            print("Algo aconteceu ou não tem mais contatos para cadastrar.")
-            logging.warning(KeyError)
-            break
-        except Exception as e:
-            print(e)
-            logging.warning(e)
-            break
+        print("\n")
+        print("#"*10)
+        print(f"Página {pagina}")
+        print("#"*10)
+        if get_bling(modulo='produtos', pagina=pagina):
+            coloca_contatos_no_banco(get_bling(modulo='produtos', pagina=pagina)) 
         else:
-            print(f"{pagina} páginas foram cadastradas.")
+            print(f"Página {pagina} não cadastrada")
+            break
+        sleep(0.4)
 main()
