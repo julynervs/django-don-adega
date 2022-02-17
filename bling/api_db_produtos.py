@@ -227,10 +227,9 @@ def main():
         if get_bling(modulo='produtos', pagina=pagina):
             coloca_produtos_no_banco(get_bling(modulo='produtos', pagina=pagina)) 
         else:
-            print(f"Página {pagina} não cadastrada")
+            print(f"Página {pagina} não encontrada")
             break
         sleep(0.4)
-main()
 
-
-#%%%%
+if __name__ == "__main__":
+    main()

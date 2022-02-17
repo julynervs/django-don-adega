@@ -20,7 +20,7 @@ logging.basicConfig(
             filename='api_db_contatos.log', encoding='utf-8', level=logging.INFO,
             format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
 
-import get_bling
+from get_bling import get_bling
 
 def coloca_contatos_no_banco(retorno_get):
     """
@@ -42,7 +42,6 @@ def coloca_contatos_no_banco(retorno_get):
         chaves = list(lista_contatos[n]['contato'].keys())
 
         print(f"- Contato {n} {contato_bling['nome']} cadastrado")
-        logging.info(f"_Pag. {pagina}: Contato {n} {contato_bling['nome']} cadastrado")
 
         # filtro
         def valor_correto_ou_nada(chave):
@@ -87,7 +86,7 @@ def coloca_contatos_no_banco(retorno_get):
         ## int
         if chave_existe('id'):
             contato_db =Contato.objects.create(id_bling = valor_correto_ou_nada('id'))
-            logging.info(f"____id_bling do produto Kit {n} cadastrado")
+            logging.info(f"____id_bling do contato {n} cadastrado")
         else:
             logging.info(f"____O campo 'id_bling' NÃO foi cadastrado por não existir no json")
         
@@ -163,11 +162,14 @@ def main():
         print("\n")
         print("#"*10)
         print(f"Página {pagina}")
+        logging.info(f"Cadastrando produtos da Página {pagina}")
         print("#"*10)
-        if get_bling(modulo='produtos', pagina=pagina):
-            coloca_contatos_no_banco(get_bling(modulo='produtos', pagina=pagina)) 
+        if get_bling(modulo='contatos', pagina=pagina):
+            coloca_contatos_no_banco(get_bling(modulo='contatos', pagina=pagina)) 
         else:
-            print(f"Página {pagina} não cadastrada")
+            print(f"Página {pagina} não encontrada")
             break
         sleep(0.4)
-main()
+
+if __name__ == "__main__":
+    main()
