@@ -13,7 +13,6 @@ def get_produtos(pagina):
     response = requests.request("GET", url, headers=headers, data=payload)
     sleep(0.4)
 
-
     # verifica se a requisição deu certo
     if response.status_code == 200:
         # formata json recebido
@@ -31,14 +30,6 @@ def get_produtos(pagina):
     else:
         logging.error(f"Status code: {response.status_code}")
         return False
-    
-    # verifica 
-# %%
-if get_produtos(15):
-    coloca_produtos_no_banco(get_produtos(15)) 
-        
-
-
 
 #%%
 # Agenda #
