@@ -55,16 +55,13 @@ def coloca_produtos_no_banco(pagina):
     json = json.loads(get_produtos(pagina))
     lista_produtos = json['retorno']['produtos']
 
-    if '"produto"' not in lista_produtos:
-        logging.warning(get_produtos(pagina))
-        # print(get_produtos(pagina))
-
     print("\n")
     print("#"*10)
     print(f"Página {pagina}")
     print("#"*10)
 
     # percorre a lista de todos os produtos
+    print(len(lista_produtos))
     for n in range(len(lista_produtos)):
         produto_bling = lista_produtos[n]['produto']
         chaves = list(lista_produtos[n]['produto'].keys())
@@ -218,17 +215,17 @@ def coloca_produtos_no_banco(pagina):
             
 def main():
     paginas = 250
-    for pagina in range(1, paginas):
+    for pagina in range(15, paginas):
         try:
             coloca_produtos_no_banco(pagina)
+        except KeyError as ke:
+            logging.error(ke)
+            print("Chave não encontrada no json.")
+            break
         except Exception as e:
             print(e)
             logging.error(e)
-        # except KeyError:
-        #     print(KeyError)
-        #     logging.error(KeyError)
-        #     logging.error("Chave não encontrada no json.")
-        #     break
+            break
         else:
             logging.info(f"{pagina} páginas foram cadastradas.")
 main()
