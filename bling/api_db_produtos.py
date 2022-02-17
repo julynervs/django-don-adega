@@ -38,7 +38,7 @@ def get_produtos(pagina):
     sleep(0.4)
     return response.text
 
-def coloca_produtos_no_banco(pagina):
+def coloca_produtos_no_banco(retorno):
     """
     Função que recebe o retorno de get_produtos(),
     faz o tratamento dos dados do JSON
@@ -52,13 +52,13 @@ def coloca_produtos_no_banco(pagina):
 
     # get_produtos(pagina)
     # formata json recebido
-    json = json.loads(get_produtos(pagina))
-    lista_produtos = json['retorno']['produtos']
+    json = json.loads(retorno)
+    lista_produtos = json['produtos']
 
-    print("\n")
-    print("#"*10)
-    print(f"Página {pagina}")
-    print("#"*10)
+    # print("\n")
+    # print("#"*10)
+    # print(f"Página {pagina}")
+    # print("#"*10)
 
     # percorre a lista de todos os produtos
     print(len(lista_produtos))
@@ -216,16 +216,5 @@ def coloca_produtos_no_banco(pagina):
 def main():
     paginas = 250
     for pagina in range(15, paginas):
-        try:
-            coloca_produtos_no_banco(pagina)
-        except KeyError as ke:
-            logging.error(ke)
-            print("Chave não encontrada no json.")
-            break
-        except Exception as e:
-            print(e)
-            logging.error(e)
-            break
-        else:
-            logging.info(f"{pagina} páginas foram cadastradas.")
+        
 main()
