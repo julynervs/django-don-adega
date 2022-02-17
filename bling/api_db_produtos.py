@@ -7,6 +7,7 @@ import requests
 import os
 import sys
 from time import sleep
+import json
 
 sys.path.insert(1, os.path.abspath("."))
 import donadega.settings
@@ -28,15 +29,33 @@ logging.basicConfig(
 # CRITICAL -> Um erro grave, indicando que o programa pode não conseguir continuar rodando.
 
 
-def get_produtos(pagina):
+def get_produtos(pagina, modulo):
+
     url = f"https://bling.com.br/Api/v2/produtos/page={pagina}/json/?apikey=a46ebb16b15e9fdfade2817a3b346942fabe8320811de301aa81b5cbde6feb6d864c1d19"
     payload='apikey=a46ebb16b15e9fdfade2817a3b346942fabe8320811de301aa81b5cbde6feb6d864c1d19'
     headers = {
     'Content-Type': 'application/x-www-form-urlencoded'
     }
     response = requests.request("GET", url, headers=headers, data=payload)
-    sleep(0.4)
-    return response.text
+
+    # verifica se a requisição deu certo
+    if response.status_code == 200:
+        # formata json recebido
+        response = json.loads(response.text)
+        response = response['retorno']
+        # caso tenha erros retornados pelo json
+        if 'erros' in response.keys():
+            #print(response['erros'])
+            logging.error(response['erros'])
+            return False
+        # se não tiver erro no json
+        else:
+            return response
+    # erro de requisição status code (quando for diferente de 200)
+    else:
+        logging.error(f"Status code: {response.status_code}")
+        return False
+
 
 def coloca_produtos_no_banco(retorno):
     """
@@ -44,24 +63,16 @@ def coloca_produtos_no_banco(retorno):
     faz o tratamento dos dados do JSON
     e salva essas informações no banco de dados do Django
     """
-    import json
     from bling.models import Produto
     from bling.models import ProdutoKit
     from bling.models import CategoriaProduto
     from bling.models import CategoriaProdutoKit
 
-    # get_produtos(pagina)
-    # formata json recebido
-    json = json.loads(retorno)
-    lista_produtos = json['produtos']
+    lista_produtos = retorno['produtos']
 
-    # print("\n")
-    # print("#"*10)
-    # print(f"Página {pagina}")
-    # print("#"*10)
-
+    pagina = 15
     # percorre a lista de todos os produtos
-    print(len(lista_produtos))
+    # print(len(lista_produtos))
     for n in range(len(lista_produtos)):
         produto_bling = lista_produtos[n]['produto']
         chaves = list(lista_produtos[n]['produto'].keys())
@@ -215,6 +226,18 @@ def coloca_produtos_no_banco(retorno):
             
 def main():
     paginas = 250
-    for pagina in range(15, paginas):
-        
+    for pagina in range(1, paginas):
+        print("\n")
+        print("#"*10)
+        print(f"Página {pagina}")
+        print("#"*10)
+        if get_produtos(pagina):
+            coloca_produtos_no_banco(get_produtos(pagina)) 
+        else:
+            print(f"Página {pagina} não cadastrada")
+            break
+        sleep(0.4)
 main()
+
+
+#%%%%
