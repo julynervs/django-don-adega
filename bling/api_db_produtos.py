@@ -18,49 +18,22 @@ logging.basicConfig(
             filename='api_db_produtos.log', encoding='utf-8', level=logging.INFO,
             format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
 
-### LOGGING ###
-# Nível  |  Quando é usando
-# DEBUG -> Informação detalhada, tipicamente de interesse apenas quando diagnosticando problemas.
-# INFO -> Confirmação de que as coisas estão funcionando como esperado.
-# WARNING -> Uma indicação que algo inesperado aconteceu, ou um indicativo que algum problema 
-#            em um futuro próximo (ex.: ‘pouco espaço em disco’). 
-#            O software está ainda funcionando como esperado.
-# ERROR -> Por conta de um problema mais grave, o software não conseguiu executar alguma função.
-# CRITICAL -> Um erro grave, indicando que o programa pode não conseguir continuar rodando.
+"""
+## LOGGING ###
+Nível  |  Quando é usando
+DEBUG -> Informação detalhada, tipicamente de interesse apenas quando diagnosticando problemas.
+INFO -> Confirmação de que as coisas estão funcionando como esperado.
+WARNING -> Uma indicação que algo inesperado aconteceu, ou um indicativo que algum problema 
+           em um futuro próximo (ex.: ‘pouco espaço em disco’). 
+           O software está ainda funcionando como esperado.
+ERROR -> Por conta de um problema mais grave, o software não conseguiu executar alguma função.
+CRITICAL -> Um erro grave, indicando que o programa pode não conseguir continuar rodando.
+"""
+import get_bling
 
-
-def get_produtos(pagina, modulo):
-
-    url = f"https://bling.com.br/Api/v2/produtos/page={pagina}/json/?apikey=a46ebb16b15e9fdfade2817a3b346942fabe8320811de301aa81b5cbde6feb6d864c1d19"
-    payload='apikey=a46ebb16b15e9fdfade2817a3b346942fabe8320811de301aa81b5cbde6feb6d864c1d19'
-    headers = {
-    'Content-Type': 'application/x-www-form-urlencoded'
-    }
-    response = requests.request("GET", url, headers=headers, data=payload)
-
-    # verifica se a requisição deu certo
-    if response.status_code == 200:
-        # formata json recebido
-        response = json.loads(response.text)
-        response = response['retorno']
-        # caso tenha erros retornados pelo json
-        if 'erros' in response.keys():
-            #print(response['erros'])
-            logging.error(response['erros'])
-            return False
-        # se não tiver erro no json
-        else:
-            return response
-    # erro de requisição status code (quando for diferente de 200)
-    else:
-        logging.error(f"Status code: {response.status_code}")
-        return False
-
-
-def coloca_produtos_no_banco(retorno):
+def coloca_produtos_no_banco(retorno_get):
     """
-    Função que recebe o retorno de get_produtos(),
-    faz o tratamento dos dados do JSON
+    Função que recebe o retorno de um JSON
     e salva essas informações no banco de dados do Django
     """
     from bling.models import Produto
@@ -68,9 +41,7 @@ def coloca_produtos_no_banco(retorno):
     from bling.models import CategoriaProduto
     from bling.models import CategoriaProdutoKit
 
-    lista_produtos = retorno['produtos']
-
-    pagina = 15
+    lista_produtos = retorno_get['produtos']
     # percorre a lista de todos os produtos
     # print(len(lista_produtos))
     for n in range(len(lista_produtos)):
@@ -231,8 +202,8 @@ def main():
         print("#"*10)
         print(f"Página {pagina}")
         print("#"*10)
-        if get_produtos(pagina):
-            coloca_produtos_no_banco(get_produtos(pagina)) 
+        if get_bling(modulo='produtos', pagina=pagina):
+            coloca_produtos_no_banco(get_bling(modulo='produtos', pagina=pagina)) 
         else:
             print(f"Página {pagina} não cadastrada")
             break
