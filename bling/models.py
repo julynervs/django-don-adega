@@ -158,7 +158,6 @@ class ContaPagar(models.Model):
     historico = models.CharField(max_length=255, default="", null=True, blank=True)
     categoria = models.CharField(max_length=255, default="", null=True, blank=True)
     portador = models.CharField(max_length=255, default="", null=True, blank=True)
-    forma_pagamento = models.ForeignKey(FormaPagamento, on_delete=models.DO_NOTHING, null=True)
     ocorrencia = models.CharField(max_length=255, default="", null=True, blank=True)
     nro_parcelas = models.IntegerField(null=True, blank=True)
     fornecedor = models.ForeignKey(Contato, on_delete=models.DO_NOTHING, null=True)
