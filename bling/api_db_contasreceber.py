@@ -23,8 +23,8 @@ def coloca_contasreceber_no_banco(retorno_get):
 
     # percorre a lista de todos os contas
     for n in range(len(lista_contas)):
-        conta_bling = lista_contas[n]['contareceber']
-        chaves = list(lista_contas[n]['contareceber'].keys())
+        conta_bling = lista_contas[n]['contaReceber']
+        chaves = list(lista_contas[n]['contaReceber'].keys())
 
         # filtro
         def valor_correto_ou_nada(chave):
@@ -135,7 +135,7 @@ def main():
         print(f"Página {pagina}")
         logging.info(f"Cadastrando contas a receber da Página {pagina}")
         print("#"*10)
-        if get_bling(modulo='contaspagar', pagina=pagina):
+        if get_bling(modulo='contasreceber', pagina=pagina):
             coloca_contasreceber_no_banco(get_bling(modulo='contasreceber', pagina=pagina)) 
         else:
             print(f"Página {pagina} não encontrada")
