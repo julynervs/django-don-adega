@@ -18,6 +18,7 @@ from get_bling import get_bling
 def coloca_contaspagar_no_banco(retorno_get):
     from bling.models import Contato
     from bling.models import ContaPagar
+    from bling.models import Pagamento
 
     lista_contas = retorno_get['contaspagar']
 
@@ -28,20 +29,19 @@ def coloca_contaspagar_no_banco(retorno_get):
 
         # filtro
         def valor_correto_ou_nada(chave):
-            if conta_bling[chave] == '':
+            # filtro para existencia de um dado no JSON do Bling
+            def chave_existe(chave_bling):
+                if chave_bling in conta_bling.keys():
+                    return True
+                else:
+                    return False   
+            if conta_bling[chave] == '' or not chave_existe:
                 logging.warning(f"____{chave} da conta {n} incorreta ou não existente, None definido no campo")
                 return None
             else:
                 logging.info(f"____{chave} da conta {n} cadastrada")
                 return conta_bling[chave]
-
-        # filtro para existencia de um dado no JSON do Bling
-        def chave_existe(chave_bling):
-            if chave_bling in conta_bling.keys():
-                return True
-            else:
-                return False   
-
+    
         # cadastro foreign key
         # # identifica o fornecedor que fez a conta
         # # e obtém o mesmo do banco de dados
@@ -50,70 +50,34 @@ def coloca_contaspagar_no_banco(retorno_get):
         conta_db = ContaPagar.objects.create(fornecedor = fornecedor_db)
 
         # cadastros data
-        if chave_existe('dataEmissao'):
-            conta_db = ContaPagar.objects.create(data_emissao = valor_correto_ou_nada('dataEmissao'))   
-            logging.info(f"____data_emissao do pedido {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'data_emissao' NÃO foi cadastrado por não existir no json")
-
-        if chave_existe('vencimento'):
-            conta_db = ContaPagar.objects.create(vencimento = valor_correto_ou_nada('vencimento'))   
-            logging.info(f"____vencimento do pedido {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'vencimento' NÃO foi cadastrado por não existir no json")
-
-        if chave_existe('competencia'):
-            conta_db = ContaPagar.objects.create(competencia = valor_correto_ou_nada('competencia'))   
-            logging.info(f"____competencia do pedido {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'competencia' NÃO foi cadastrado por não existir no json")
+        conta_db = ContaPagar.objects.create(data_emissao = valor_correto_ou_nada('dataEmissao'))   
+        conta_db = ContaPagar.objects.create(vencimento = valor_correto_ou_nada('vencimento'))   
+        conta_db = ContaPagar.objects.create(competencia = valor_correto_ou_nada('competencia'))   
 
         # cadastros float
-        if chave_existe('valor'):
-            conta_db = ContaPagar.objects.create(valor = valor_correto_ou_nada('valor'))   
-            logging.info(f"____valor do pedido {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'valor' NÃO foi cadastrado por não existir no json")
-        if chave_existe('saldo'):
-            conta_db = ContaPagar.objects.create(saldo = valor_correto_ou_nada('saldo'))   
-            logging.info(f"____saldo do pedido {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'saldo' NÃO foi cadastrado por não existir no json")
-        
+        conta_db = ContaPagar.objects.create(valor = valor_correto_ou_nada('valor'))   
+        conta_db = ContaPagar.objects.create(saldo = valor_correto_ou_nada('saldo'))   
+     
         # cadastros int
-        if chave_existe('id'):
-            conta_db = ContaPagar.objects.create(id_bling = valor_correto_ou_nada('id'))   
-            logging.info(f"____id_bling do pedido {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'id_bling' NÃO foi cadastrado por não existir no json")
-
+        conta_db = ContaPagar.objects.create(id_bling = valor_correto_ou_nada('id'))   
+        
         # cadastros string
-        if chave_existe('situacao'):
-            conta_db = ContaPagar.objects.create(situacao = valor_correto_ou_nada('situacao'))   
-            logging.info(f"____situacao do pedido {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'situacao' NÃO foi cadastrado por não existir no json")
+        conta_db = ContaPagar.objects.create(situacao = valor_correto_ou_nada('situacao'))   
+        conta_db = ContaPagar.objects.create(historico = valor_correto_ou_nada('historico'))   
+        conta_db = ContaPagar.objects.create(ocorrencia = valor_correto_ou_nada('ocorrencia'))          
+        conta_db = ContaPagar.objects.create(categoria = valor_correto_ou_nada('categoria'))   
 
-        if chave_existe('historico'):
-            conta_db = ContaPagar.objects.create(historico = valor_correto_ou_nada('historico'))   
-            logging.info(f"____historico do pedido {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'historico' NÃO foi cadastrado por não existir no json")
-
-        if chave_existe('ocorrencia'):
-            conta_db = ContaPagar.objects.create(ocorrencia = valor_correto_ou_nada('ocorrencia'))   
-            logging.info(f"____ocorrencia do pedido {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'ocorrencia' NÃO foi cadastrado por não existir no json")
-
-        if chave_existe('categoria'):
-            conta_db = ContaPagar.objects.create(categoria = valor_correto_ou_nada('categoria'))   
-            logging.info(f"____categoria do pedido {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'categoria' NÃO foi cadastrado por não existir no json")
-      
         conta_db.save()
+
+        ## cadastro da tabela Pagamento
+        conta_bling = conta_bling['pagamento']
+        pagamento_db = Pagamento.objects.create(conta_pagar = conta_db)
+        pagamento_db = Pagamento.objects.create(total_pago = valor_correto_ou_nada('totalPago')) 
+        pagamento_db = Pagamento.objects.create(total_pago = valor_correto_ou_nada('totalPago'))
+        pagamento_db = Pagamento.objects.create(total_pago = valor_correto_ou_nada('totalPago'))
+
         print(f"- Conta a pagar {n} {conta_bling['historico']} cadastrada")
+        break
 
 def main():
     paginas = 250
@@ -129,6 +93,7 @@ def main():
             print(f"Página {pagina} não encontrada")
             break
         sleep(0.4)
+        break
 
 if __name__ == "__main__":
     main()
