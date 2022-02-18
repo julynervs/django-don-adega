@@ -126,3 +126,21 @@ def coloca_contasreceber_no_banco(retorno_get):
       
         conta_db.save()
         print(f"- Conta a receber {n} {conta_bling['historico']} cadastrada")
+
+def main():
+    paginas = 250
+    for pagina in range(1, paginas):
+        print("\n")
+        print("#"*10)
+        print(f"Página {pagina}")
+        logging.info(f"Cadastrando contas a receber da Página {pagina}")
+        print("#"*10)
+        if get_bling(modulo='contaspagar', pagina=pagina):
+            coloca_contasreceber_no_banco(get_bling(modulo='contasreceber', pagina=pagina)) 
+        else:
+            print(f"Página {pagina} não encontrada")
+            break
+        sleep(0.4)
+
+if __name__ == "__main__":
+    main()
