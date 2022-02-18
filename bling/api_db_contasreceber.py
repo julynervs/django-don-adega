@@ -18,6 +18,7 @@ from get_bling import get_bling
 def coloca_contasreceber_no_banco(retorno_get):
     from bling.models import Contato
     from bling.models import ContaReceber
+    from bling.models import FormaPagamento
 
     lista_contas = retorno_get['contasreceber']
 
@@ -50,7 +51,7 @@ def coloca_contasreceber_no_banco(retorno_get):
         conta_db = ContaReceber.objects.create(cliente = cliente_db)
         
         forma_pagamento_bling = conta_bling['idFormaPagamento']
-        forma_pagamento_db = Contato.objects.filter(forma_pagamento=forma_pagamento_bling).order_by('id').first()            
+        forma_pagamento_db = FormaPagamento.objects.filter(descricao=forma_pagamento_bling).order_by('id').first()            
         conta_db = ContaReceber.objects.create(forma_pagamento = forma_pagamento_db)
 
         # cadastros data
