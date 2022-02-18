@@ -138,6 +138,61 @@ class Pedido(models.Model):
     def __str__(self):
         return self.numero
 
+class FormaPagamento(models.Model):
+    id_bling = models.IntegerField(null=True, blank=True)
+    descricao = models.CharField(max_length=30, default="", null=True, blank=True)
+    codigo_fiscal = models.IntegerField(null=True, blank=True)
+    padrao = models.IntegerField(null=True, blank=True)
+    situacao = models.IntegerField(null=True, blank=True)
+    fixa = models.IntegerField(null=True, blank=True)
+
+class ContaPagar(models.Model):
+    id_bling = models.IntegerField(null=True)
+    situacao = models.CharField(max_length=30, default="", null=True, blank=True)
+    data_emissao = models.DateTimeField(null=True, blank=True)
+    vencimento = models.DateTimeField(null=True, blank=True)
+    competencia = models.DateTimeField(null=True, blank=True)
+    nro_documento = models.CharField(max_length=25, default="", null=True, blank=True)
+    valor = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    saldo = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    historico = models.CharField(max_length=255, default="", null=True, blank=True)
+    categoria = models.CharField(max_length=255, default="", null=True, blank=True)
+    portador = models.CharField(max_length=255, default="", null=True, blank=True)
+    forma_pagamento = models.ForeignKey(FormaPagamento, on_delete=models.DO_NOTHING, null=True)
+    ocorrencia = models.CharField(max_length=255, default="", null=True, blank=True)
+    nro_parcelas = models.IntegerField(null=True, blank=True)
+    fornecedor = models.ForeignKey(Contato, on_delete=models.DO_NOTHING, null=True)
+
+class ContaReceber(models.Model):
+    id_bling = models.IntegerField(null=True)
+    situacao = models.CharField(max_length=30, default="", null=True, blank=True)
+    data_emissao = models.DateTimeField(null=True, blank=True)
+    vencimento = models.DateTimeField(null=True, blank=True)
+    competencia = models.DateTimeField(null=True, blank=True)
+    nro_documento = models.CharField(max_length=25, default="", null=True, blank=True)
+    valor = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    saldo = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    historico = models.CharField(max_length=255, default="", null=True, blank=True)
+    categoria = models.CharField(max_length=255, default="", null=True, blank=True)
+    portador = models.CharField(max_length=255, default="", null=True, blank=True)
+    forma_pagamento = models.ForeignKey(FormaPagamento, on_delete=models.DO_NOTHING, null=True)
+    ocorrencia = models.CharField(max_length=255, default="", null=True, blank=True)
+    nro_parcelas = models.IntegerField(null=True, blank=True)
+    fornecedor = models.ForeignKey(Contato, on_delete=models.DO_NOTHING, null=True)
+
+class Pagamento(models.Model):
+    conta_pagar = models.ForeignKey(ContaPagar, on_delete=models.CASCADE, null=True)
+    total_pago = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    total_juro = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    total_desconto = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    total_acrescimo = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    total_tarifa = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    data = models.DateTimeField(null=True, blank=True)
+
+class Bordero(models.Model):
+    pagamento = models.ForeignKey(Pagamento, on_delete=models.CASCADE, null=True)
+
+
 class Item(models.Model):
     codigo = models.CharField(max_length=60, default="", null=True, blank=True)
     descricao = models.CharField(max_length=120, default="", null=True)
