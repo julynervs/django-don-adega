@@ -42,12 +42,16 @@ def coloca_contasreceber_no_banco(retorno_get):
             else:
                 return False   
 
-        # cadastro foreign key
+        # cadastros foreign key
         # # identifica o cliente que fez a conta
         # # e obtém o mesmo do banco de dados
         nome_cliente_bling = conta_bling['cliente']['nome']
         cliente_db = Contato.objects.filter(nome=nome_cliente_bling).order_by('id').first()            
         conta_db = ContaReceber.objects.create(cliente = cliente_db)
+        
+        forma_pagamento_bling = conta_bling['idFormaPagamento']
+        forma_pagamento_db = Contato.objects.filter(forma_pagamento=forma_pagamento_bling).order_by('id').first()            
+        conta_db = ContaReceber.objects.create(forma_pagamento = forma_pagamento_db)
 
         # cadastros data
         if chave_existe('dataEmissao'):
