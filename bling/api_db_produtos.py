@@ -47,76 +47,40 @@ def coloca_produtos_no_banco(retorno_get):
         produto_bling = lista_produtos[n]['produto']
         chaves = list(lista_produtos[n]['produto'].keys())
 
-        # filtro
-        def valor_correto_ou_nada(chave):
-            if produto_bling[chave] == '':
-                logging.warning(f"____{chave} do produto {n} {produto_bling['descricao']} incorreta ou não existente, None definido no campo")
-                return None
-            else:
-                logging.info(f"____{chave} do produto {n} cadastrada")
-                return produto_bling[chave]
         # filtro para existencia de um dado no JSON do Bling
-        def chave_existe(chave_bling):
-            if chave_bling in produto_bling.keys():
-                return True
+        def valor_correto_ou_nada(chave, dict_bling=produto_bling):
+            # filtro para existencia de um dado no JSON do Bling
+            # se a chave existe, verifica qual o valor relativo à ela
+            if chave in dict_bling.keys():
+                # se o valor relativo for '', é um valor incorreto, então retorna None
+                if dict_bling[chave] == '':
+                    logging.warning(f"____{chave} da conta {n} incorreta ou não existente, None definido no campo")
+                    return None
+                # se o valor estiver correto, retorna o valor
+                else:
+                    logging.info(f"____{chave} da conta {n} cadastrada")
+                    return dict_bling[chave]
+            # se a chave não existe, retorna None
             else:
-                return False    
+                return None    
 
         if 'estrutura' in chaves:
+            pass
             # cadastro de campos datas
-            if chave_existe('dataAlteracao'):
-                kit_db = ProdutoKit.objects.create(data_alteracao = valor_correto_ou_nada('dataAlteracao'))
-                logging.info(f"____data_alteracao do produto Kit {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'data_alteracao' NÃO foi cadastrado por não existir no json")
-            
-            if chave_existe('dataInclusao'):
-                kit_db = ProdutoKit.objects.create(data_inclusao = valor_correto_ou_nada('dataInclusao'))
-                logging.info(f"____data_inclusao do produto Kit {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'data_inclusao' NÃO foi cadastrado por não existir no json")
-
+            kit_db = ProdutoKit.objects.create(data_alteracao = valor_correto_ou_nada('dataAlteracao'))
+            kit_db = ProdutoKit.objects.create(data_inclusao = valor_correto_ou_nada('dataInclusao'))
             # cadastro de campos numéricos
             ## int
-            if chave_existe('id'):
-                kit_db = ProdutoKit.objects.create(id_bling = valor_correto_ou_nada('id'))
-                logging.info(f"____id_bling do produto Kit {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'id_bling' NÃO foi cadastrado por não existir no json")
+            kit_db = ProdutoKit.objects.create(id_bling = valor_correto_ou_nada('id'))
             ## float
-            if chave_existe('preco'):
-                kit_db = ProdutoKit.objects.create(preco = valor_correto_ou_nada('preco'))
-                logging.info(f"____preco do produto Kit {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'preco' NÃO foi cadastrado por não existir no json")
-            
-            if chave_existe('precoCusto'):
-                kit_db = ProdutoKit.objects.create(preco_custo = valor_correto_ou_nada('precoCusto'))
-                logging.info(f"____preco_custo do produto Kit {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'preco_custo' NÃO foi cadastrado por não existir no json")
-            
-            if chave_existe('larguraProduto'):
-                kit_db = ProdutoKit.objects.create(largura_produto = valor_correto_ou_nada('larguraProduto'))
-                logging.info(f"____largura_produto do produto Kit {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'largura_produto' NÃO foi cadastrado por não existir no json")
-            
-            if chave_existe('alturaProduto'):
-                kit_db = ProdutoKit.objects.create(altura_produto = valor_correto_ou_nada('alturaProduto'))
-                logging.info(f"____altura_produto do produto Kit {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'altura_produto' NÃO foi cadastrado por não existir no json")
-            
-            if chave_existe('profundidadeProduto'):
-                kit_db = ProdutoKit.objects.create(profundidade_produto = valor_correto_ou_nada('profundidadeProduto'))
-                logging.info(f"____profundidade_produto do produto Kit {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'profundidade_produto' NÃO foi cadastrado por não existir no json")
-
+            kit_db = ProdutoKit.objects.create(preco = valor_correto_ou_nada('preco'))
+            kit_db = ProdutoKit.objects.create(preco_custo = valor_correto_ou_nada('precoCusto'))
+            kit_db = ProdutoKit.objects.create(largura_produto = valor_correto_ou_nada('larguraProduto'))
+            kit_db = ProdutoKit.objects.create(altura_produto = valor_correto_ou_nada('alturaProduto'))
+            kit_db = ProdutoKit.objects.create(profundidade_produto = valor_correto_ou_nada('profundidadeProduto'))
+              
             # cadastro campos texto
-            kit_db = ProdutoKit.objects.create(
-                descricao = valor_correto_ou_nada('descricao'))
+            kit_db = ProdutoKit.objects.create(descricao = valor_correto_ou_nada('descricao'))
             kit_db = ProdutoKit.objects.create(
                 codigo = valor_correto_ou_nada('codigo'),
                 tipo = valor_correto_ou_nada('tipo'),
@@ -138,84 +102,41 @@ def coloca_produtos_no_banco(retorno_get):
             )
             kit_db.save()
             
-            # # cria tabela de categoria dos kits
-            categoria_bling = lista_produtos[n]['produto']['categoria']
-            categoria_db = CategoriaProdutoKit.objects.create(
-                id_bling = categoria_bling['id'], 
-                descricao = categoria_bling['descricao'],
-                produto_kit = kit_db
-            )
-            categoria_db.save()
+            
 
             print(f"- ProdutoKit {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
         else:
-            # cria um objeto (linha) da tabela produto no Django
-            # insere os dados do bling no modelo e salva
-            
+            ## cria um objeto (linha) da tabela produto no Django
+            ## insere os dados do bling no modelo e salva
             # cadastro de campos datas
-            if chave_existe('dataAlteracao'):
-                produto_db = Produto.objects.create(data_alteracao = valor_correto_ou_nada('dataAlteracao'))
-                logging.info(f"____data_alteracao do produto {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'data_alteracao' NÃO foi cadastrado por não existir no json")
-            
-            if chave_existe('dataInclusao'):
-                produto_db = Produto.objects.create(data_inclusao = valor_correto_ou_nada('dataInclusao'))
-                logging.info(f"____data_inclusao do produto {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'data_inclusao' NÃO foi cadastrado por não existir no json")
-
+            produto_db = Produto.objects.create(data_alteracao = valor_correto_ou_nada('dataAlteracao'))
+            produto_db = Produto.objects.create(data_inclusao = valor_correto_ou_nada('dataInclusao'))
             # cadastro de campos numéricos
             ## int
-            if chave_existe('id'):
-                produto_db = Produto.objects.create(id_bling = valor_correto_ou_nada('id'))
-                logging.info(f"____id_bling do produto {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'id_bling' NÃO foi cadastrado por não existir no json")
+            produto_db = Produto.objects.create(id_bling = valor_correto_ou_nada('id'))
             ## float
-            if chave_existe('preco'):
-                produto_db = Produto.objects.create(preco = valor_correto_ou_nada('preco'))
-                logging.info(f"____preco do produto {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'preco' NÃO foi cadastrado por não existir no json")
-            
-            if chave_existe('precoCusto'):
-                produto_db = Produto.objects.create(preco_custo = valor_correto_ou_nada('precoCusto'))
-                logging.info(f"____preco_custo do produto {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'preco_custo' NÃO foi cadastrado por não existir no json")
-            
-            if chave_existe('larguraProduto'):
-                produto_db = Produto.objects.create(largura_produto = valor_correto_ou_nada('larguraProduto'))
-                logging.info(f"____largura_produto do produto {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'largura_produto' NÃO foi cadastrado por não existir no json")
-            
-            if chave_existe('alturaProduto'):
-                produto_db = Produto.objects.create(altura_produto = valor_correto_ou_nada('alturaProduto'))
-                logging.info(f"____altura_produto do produto {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'altura_produto' NÃO foi cadastrado por não existir no json")
-            
-            if chave_existe('profundidadeProduto'):
-                produto_db = Produto.objects.create(profundidade_produto = valor_correto_ou_nada('profundidadeProduto'))
-                logging.info(f"____profundidade_produto do produto {n} cadastrado")
-            else:
-                logging.info(f"____O campo 'profundidade_produto' NÃO foi cadastrado por não existir no json")
-
+            produto_db = Produto.objects.create(preco = valor_correto_ou_nada('preco'))
+            produto_db = Produto.objects.create(preco_custo = valor_correto_ou_nada('precoCusto'))
+            produto_db = Produto.objects.create(largura_produto = valor_correto_ou_nada('larguraProduto'))
+            produto_db = Produto.objects.create(altura_produto = valor_correto_ou_nada('alturaProduto'))
+            produto_db = Produto.objects.create(profundidade_produto = valor_correto_ou_nada('profundidadeProduto'))
             produto_db.save()
             
-            # # cria tabela de categoria dos produtos
-            categoria_bling = lista_produtos[n]['produto']['categoria']
-            categoria_db = CategoriaProduto.objects.create(
-                id_bling = categoria_bling['id'], 
-                descricao = categoria_bling['descricao'],
-                produto = produto_db
-            )
-            categoria_db.save()
-
-            print(f"- Produto {n} {produto_bling['codigo']}, Categoria {categoria_bling['descricao']} cadastrado")
-            
+            def encontrar_ou_criar():
+                # cadastros foreign key
+                # # identifica o cliente que fez a conta
+                # # e obtém o mesmo do banco de dados
+                codigo_produto_bling = produto_bling['codigo']
+                if CategoriaProduto.objects.filter(codigo=codigo_produto_bling).order_by('id').first():
+                    categoria_db = CategoriaProduto.objects.filter(nome=codigo_produto_bling).order_by('id').first()            
+                else:
+                    categoria_db = CategoriaProduto.objects.create(id_bling = valor_correto_ou_nada('id'))
+                    categoria_db = CategoriaProduto.objects.create(descricao = valor_correto_ou_nada('descricao'))
+                    categoria_db = CategoriaProduto.objects.create(id_categoria_pai = valor_correto_ou_nada('id_categoria_pai'))
+                    categoria_db.save()
+                produto_db = Produto.objects.create(categoria = categoria_db)
+                produto_db.save()
+            encontrar_ou_criar()
 def main():
     paginas = 250
     for pagina in range(1, paginas):

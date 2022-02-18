@@ -43,21 +43,22 @@ def coloca_contatos_no_banco(retorno_get):
 
         print(f"- Contato {n} {contato_bling['nome']} cadastrado")
 
-        # filtro
-        def valor_correto_ou_nada(chave):
-            if contato_bling[chave] == '':
-                logging.warning(f"____{chave} do contato {contato_bling['nome']} incorreta ou não existente, None definido no campo")
-                return None
-            else:
-                logging.info(f"____{chave} do contato {contato_bling['nome']} cadastrada")
-                return contato_bling[chave]
-
         # filtro para existencia de um dado no JSON do Bling
         def chave_existe(chave_bling):
             if chave_bling in contato_bling.keys():
                 return True
             else:
                 return False
+
+        # filtro
+        def valor_correto_ou_nada(chave):
+            if contato_bling[chave] == '' or not chave_existe(chave):
+                logging.warning(f"____{chave} do contato {contato_bling['nome']} incorreta ou não existente, None definido no campo")
+                return None
+            else:
+                logging.info(f"____{chave} do contato {contato_bling['nome']} cadastrada")
+                return contato_bling[chave]
+
 
         # cadastro campos de string
         contato_db = Contato.objects.create(codigo = valor_correto_ou_nada('codigo'))
@@ -84,26 +85,13 @@ def coloca_contatos_no_banco(retorno_get):
 
         # cadastro campos numéricos
         ## int
-        if chave_existe('id'):
-            contato_db =Contato.objects.create(id_bling = valor_correto_ou_nada('id'))
-            logging.info(f"____id_bling do contato {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'id_bling' NÃO foi cadastrado por não existir no json")
-        
-        if chave_existe('contribuinte'):
-            contato_db = Contato.objects.create(contribuinte = contato_bling['contribuinte'])
-            logging.info(f"____contribuinte do contato {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'contribuinte' NÃO foi cadastrado por não existir no json")
+        contato_db =Contato.objects.create(id_bling = valor_correto_ou_nada('id'))
+        contato_db = Contato.objects.create(contribuinte = contato_bling['contribuinte'])
+
         ## float
-        if chave_existe('limiteCredito'):
-            contato_db = Contato.objects.create(limite_credito = contato_bling['limiteCredito'])
-            logging.info(f"____limite_credito do contato {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'contribuinte' NÃO foi cadastrado por não existir no json")
+        contato_db = Contato.objects.create(limite_credito = contato_bling['limiteCredito'])
         # email
         contato_db = Contato.objects.create(email = contato_bling['email'])
-        logging.info(f"____email do contato {n} cadastrado")
 
         # filtro para datas corretas, caso no Bling tenho um cadastro com uma data que não existe
         def data_correta_ou_nada(chave_data):
@@ -114,34 +102,12 @@ def coloca_contatos_no_banco(retorno_get):
                 logging.info(f"____{chave_data} do contato {n} cadastrada")
                 return contato_bling[chave_data]
 
-        # cadastro campos de data
-        # for chave_lista in ['dataInclusao', 'dataAlteracao', 'clienteDesde', 'dataNascimento']:
-        # verifica existencia do campo
-        # se o campo não existe no JSON, o dado não é cadastrado no banco de dados
-        if chave_existe('dataInclusao'):
-            contato_db = Contato.objects.create(data_inclusao = data_correta_ou_nada('dataInclusao'))
-            logging.info(f"____data_inclusao do contato {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'dataInclusao' não foi cadastrado por não existir no json")
-
-        if chave_existe('dataAlteracao'):
-            contato_db = Contato.objects.create(data_alteracao = data_correta_ou_nada('dataAlteracao'))
-            logging.info(f"____data_alteracao do contato {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'dataAlteracao' não foi cadastrado por não existir no json")
-
-        if chave_existe('clienteDesde'):
-            contato_db = Contato.objects.create(cliente_desde = data_correta_ou_nada('clienteDesde'))
-            logging.info(f"____cliente_desde do contato {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'cliente_desde' não foi cadastrado por não existir no json")
-
-        if chave_existe('dataNascimento'):
-            contato_db = Contato.objects.create(data_nascimento = data_correta_ou_nada('dataNascimento'))
-            logging.info(f"____data_nascimento do contato {n} cadastrado")
-        else:
-            logging.info(f"____O campo 'dataNascimento' não foi cadastrado por não existir no json")
-    
+        # cadastro campos de data       
+        contato_db = Contato.objects.create(data_inclusao = data_correta_ou_nada('dataInclusao'))
+        contato_db = Contato.objects.create(data_alteracao = data_correta_ou_nada('dataAlteracao'))
+        contato_db = Contato.objects.create(cliente_desde = data_correta_ou_nada('clienteDesde'))      
+        contato_db = Contato.objects.create(data_nascimento = data_correta_ou_nada('dataNascimento'))
+            
         contato_db.save()
         # sleep(0.1)
 

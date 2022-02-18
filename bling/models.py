@@ -1,7 +1,7 @@
 from django.db import models
 
 class Contato(models.Model):
-    id_bling = models.IntegerField(null=True, blank=True) # inteiro
+    id_bling = models.IntegerField(unique=True)
     codigo = models.CharField(max_length=15, default="", null=True, blank=True) # string
     nome = models.CharField(max_length=120, default="", null=True, blank=False) # string
     fantasia = models.CharField(max_length=30, default="", null=True, blank=True) # string
@@ -39,9 +39,21 @@ class TipoContato(models.Model):
     def __str__(self):
         return self.descricao
 
+class CategoriaProduto(models.Model):
+    id_bling = models.PositiveIntegerField(unique=True)
+    descricao = models.CharField(max_length=40, null=True, blank=True)
+    id_categoria_pai = models.PositiveIntegerField(null=True, blank=True)
+    def falar_oi(self):
+        print("oi")
+        return "oi"
+    # def save(self, *args, **kwargs):
+    #     self.id_categoria_pai = 101010
+    #     super(CategoriaProduto, self).save(*args, **kwargs)
+
 class Produto(models.Model):
-    id_bling = models.IntegerField(null=True)
-    codigo = models.CharField(max_length=60, default="", null=True, blank=True)
+    id_bling = models.IntegerField(unique=True)
+    codigo = models.CharField(max_length=60, default="", unique=True, null=True, blank=True)
+    categoria = models.ForeignKey(CategoriaProduto, on_delete=models.DO_NOTHING, default="")
     descricao = models.CharField(max_length=120, default="", null=True)
     tipo = models.CharField(max_length=1, default="", null=True)
     situacao = models.CharField(max_length=18, default="", null=True)
@@ -75,8 +87,9 @@ class Produto(models.Model):
         return self.descricao
 
 class ProdutoKit(models.Model):
-    id_bling = models.IntegerField(null=True)
+    id_bling = models.IntegerField(unique=True)
     codigo = models.CharField(max_length=60, default="")
+    categoria = models.ForeignKey(CategoriaProduto, on_delete=models.DO_NOTHING, default="")
     descricao = models.CharField(max_length=120, default="", null=True)
     tipo = models.CharField(max_length=1, default="", null=True)
     situacao = models.CharField(max_length=18, default="", null=True)
@@ -107,16 +120,6 @@ class ProdutoKit(models.Model):
     data_inclusao = models.DateTimeField(null=True, blank=True) # datetime.datetime
     sped_tipo_item = models.CharField(max_length=2, default="", null=True)
 
-class CategoriaProduto(models.Model):
-    id_bling = models.PositiveIntegerField(null=True, blank=True)
-    descricao = models.CharField(max_length=40, null=True, blank=True)
-    produto = models.ForeignKey(Produto, on_delete=models.DO_NOTHING, default="")
-
-class CategoriaProdutoKit(models.Model):
-    id_bling = models.PositiveIntegerField(null=True, blank=True)
-    descricao = models.CharField(max_length=40, null=True, blank=True)
-    produto_kit = models.ForeignKey(ProdutoKit, on_delete=models.DO_NOTHING, default="")
-
 class Pedido(models.Model):
     data = models.DateField(null=True, blank=True)
     data_saida = models.DateTimeField(null=True, blank=True)
@@ -139,7 +142,7 @@ class Pedido(models.Model):
         return self.numero
 
 class FormaPagamento(models.Model):
-    id_bling = models.IntegerField(null=True, blank=True)
+    id_bling = models.IntegerField(unique=True)
     descricao = models.CharField(max_length=30, default="", null=True, blank=True)
     codigo_fiscal = models.IntegerField(null=True, blank=True)
     padrao = models.IntegerField(null=True, blank=True)
@@ -147,7 +150,7 @@ class FormaPagamento(models.Model):
     fixa = models.IntegerField(null=True, blank=True)
 
 class ContaPagar(models.Model):
-    id_bling = models.IntegerField(null=True)
+    id_bling = models.IntegerField(unique=True)
     situacao = models.CharField(max_length=30, default="", null=True, blank=True)
     data_emissao = models.DateTimeField(null=True, blank=True)
     vencimento = models.DateTimeField(null=True, blank=True)
@@ -163,7 +166,7 @@ class ContaPagar(models.Model):
     fornecedor = models.ForeignKey(Contato, on_delete=models.DO_NOTHING, null=True)
 
 class ContaReceber(models.Model):
-    id_bling = models.IntegerField(null=True)
+    id_bling = models.IntegerField(unique=True)
     situacao = models.CharField(max_length=30, default="", null=True, blank=True)
     data_emissao = models.DateTimeField(null=True, blank=True)
     vencimento = models.DateTimeField(null=True, blank=True)
@@ -184,6 +187,7 @@ class ContaReceber(models.Model):
 
 class Pagamento(models.Model):
     conta_pagar = models.ForeignKey(ContaPagar, on_delete=models.CASCADE, null=True)
+    conta_receber = models.ForeignKey(ContaReceber, on_delete=models.CASCADE, null=True)
     total_pago = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
     total_juro = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
     total_desconto = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
@@ -193,7 +197,14 @@ class Pagamento(models.Model):
 
 class Bordero(models.Model):
     pagamento = models.ForeignKey(Pagamento, on_delete=models.CASCADE, null=True)
-
+    id_bling = models.IntegerField(null=True)
+    conta = models.CharField(max_length=120, default="", null=True)
+    data_pagamento = models.DateTimeField(null=True, blank=True)
+    valor_pago = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    valor_juro = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    valor_desconto = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    valor_acrescimo = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    valor_tarifa = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
 
 class Item(models.Model):
     codigo = models.CharField(max_length=60, default="", null=True, blank=True)
