@@ -42,14 +42,14 @@ def coloca_contaspagar_no_banco(retorno_get):
             else:
                 return False   
 
-        # # identifica o fornecedor que fez o conta
+        # cadastro foreign key
+        # # identifica o fornecedor que fez a conta
         # # e obtém o mesmo do banco de dados
         nome_fornecedor_bling = conta_bling['fornecedor']['nome']
         fornecedor_db = Contato.objects.filter(nome=nome_fornecedor_bling).order_by('id').first()            
-        # cria objetos conta no banco de dados
         conta_db = ContaPagar.objects.create(fornecedor = fornecedor_db)
 
-        # cadastro datas
+        # cadastros data
         if chave_existe('dataEmissao'):
             conta_db = ContaPagar.objects.create(data_emissao = valor_correto_ou_nada('dataEmissao'))   
             logging.info(f"____data_emissao do pedido {n} cadastrado")
@@ -68,7 +68,7 @@ def coloca_contaspagar_no_banco(retorno_get):
         else:
             logging.info(f"____O campo 'competencia' NÃO foi cadastrado por não existir no json")
 
-        # float
+        # cadastros float
         if chave_existe('valor'):
             conta_db = ContaPagar.objects.create(valor = valor_correto_ou_nada('valor'))   
             logging.info(f"____valor do pedido {n} cadastrado")
@@ -80,18 +80,14 @@ def coloca_contaspagar_no_banco(retorno_get):
         else:
             logging.info(f"____O campo 'saldo' NÃO foi cadastrado por não existir no json")
         
-        # int
+        # cadastros int
         if chave_existe('id'):
             conta_db = ContaPagar.objects.create(id_bling = valor_correto_ou_nada('id'))   
             logging.info(f"____id_bling do pedido {n} cadastrado")
         else:
             logging.info(f"____O campo 'id_bling' NÃO foi cadastrado por não existir no json")
 
-        chaves_json = ['id', 'situacao', 'dataEmissao','vencimento',
-                    'competencia', 'nro_documento', 'valor', 'historico',
-                    'categoria', 'portador', 'pagamento', 'ocorrencia', 'fornecedor'
-                    ]
-        # string
+        # cadastros string
         if chave_existe('situacao'):
             conta_db = ContaPagar.objects.create(situacao = valor_correto_ou_nada('situacao'))   
             logging.info(f"____situacao do pedido {n} cadastrado")
