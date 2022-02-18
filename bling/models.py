@@ -175,10 +175,13 @@ class ContaReceber(models.Model):
     historico = models.CharField(max_length=255, default="", null=True, blank=True)
     categoria = models.CharField(max_length=255, default="", null=True, blank=True)
     portador = models.CharField(max_length=255, default="", null=True, blank=True)
+    nro_banco = models.IntegerField(null=True)
     forma_pagamento = models.ForeignKey(FormaPagamento, on_delete=models.DO_NOTHING, null=True)
     ocorrencia = models.CharField(max_length=255, default="", null=True, blank=True)
     nro_parcelas = models.IntegerField(null=True, blank=True)
-    fornecedor = models.ForeignKey(Contato, on_delete=models.DO_NOTHING, null=True)
+    link_boleto = models.CharField(max_length=255, default="", null=True, blank=True)
+    vendedor = models.CharField(max_length=100, default="", null=True, blank=True)
+    cliente = models.ForeignKey(Contato, on_delete=models.DO_NOTHING, null=True)
 
 class Pagamento(models.Model):
     conta_pagar = models.ForeignKey(ContaPagar, on_delete=models.CASCADE, null=True)
