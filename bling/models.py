@@ -43,12 +43,11 @@ class CategoriaProduto(models.Model):
     id_bling = models.PositiveIntegerField(unique=True)
     descricao = models.CharField(max_length=40, null=True, blank=True)
     id_categoria_pai = models.PositiveIntegerField(null=True, blank=True)
-    def falar_oi(self):
-        print("oi")
-        return "oi"
     # def save(self, *args, **kwargs):
     #     self.id_categoria_pai = 101010
     #     super(CategoriaProduto, self).save(*args, **kwargs)
+    def __str__(self):
+        return self.descricao
 
 class Produto(models.Model):
     id_bling = models.IntegerField(unique=True)
@@ -83,6 +82,7 @@ class Produto(models.Model):
     sped_tipo_item = models.CharField(max_length=2, default="", null=True)
     data_alteracao = models.DateTimeField(null=True, blank=True) # datetime.datetime
     data_inclusao = models.DateTimeField(null=True, blank=True) # datetime.datetime
+    
     def __str__(self):
         return self.descricao
 
